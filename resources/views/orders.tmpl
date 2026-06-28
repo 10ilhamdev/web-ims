@@ -1,0 +1,84 @@
+{{ define "orders.tmpl" }}
+{{ template "layouts/header.tmpl" . }}
+
+<section class="container animated" style="padding-top: 4rem; padding-bottom: 6rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+    <div>
+      <h2 style="font-size: 2.25rem;">My Project Orders</h2>
+      <p style="color: var(--text-secondary); margin-top: 0.25rem;">Monitor the development status of your web platforms.</p>
+    </div>
+    <a href="/products" class="btn btn-primary"><i class="fa-solid fa-plus"></i> New Order</a>
+  </div>
+
+  {{ if not .Orders }}
+    <div class="card" style="text-align: center; padding: 5rem 2rem; border-color: rgba(255,255,255,0.05);">
+      <div style="font-size: 3.5rem; color: var(--text-muted); margin-bottom: 1.5rem;"><i class="fa-solid fa-folder-open"></i></div>
+      <h3 style="margin-bottom: 0.5rem; font-family: var(--font-mono);">No Orders Found</h3>
+      <p style="color: var(--text-secondary); max-width: 480px; margin: 0 auto 2.5rem;">
+        You haven't placed any development package orders yet. Browse our professional packages to kickstart your web project.
+      </p>
+      <a href="/products" class="btn btn-primary"><i class="fa-solid fa-rocket"></i> Explore Packages</a>
+    </div>
+  {{ else }}
+    <div class="card" style="background: var(--bg-secondary); border-color: var(--border-color);">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Package Name</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Placed Date</th>
+              <th>Brief Requirements</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .Orders }}
+              <tr>
+                <td style="font-family: var(--font-mono); font-weight: 600; color: var(--accent-primary);">#IMS-{{ .ID }}</td>
+                <td style="font-weight: 600;">{{ .Product.Name }}</td>
+                <td style="font-family: var(--font-mono); font-weight: 600;">
+                  Rp <span class="price-format" data-price="{{ .Price }}">{{ .Price }}</span>
+                </td>
+                <td>
+                  <span class="badge badge-{{ .Status }}">{{ .Status }}</span>
+                </td>
+                <td class="date-format" data-date="{{ .CreatedAt }}">{{ .CreatedAt }}</td>
+                <td style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ .Requirements }}">
+                  {{ .Requirements }}
+                </td>
+              </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {{ end }}
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Format prices
+    document.querySelectorAll('.price-format').forEach(el => {
+      const val = parseFloat(el.getAttribute('data-price'));
+      if (!isNaN(val)) {
+        el.textContent = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(val);
+      }
+    });
+
+    // Format dates simply
+    document.querySelectorAll('.date-format').forEach(el => {
+      const dateStr = el.getAttribute('data-date');
+      if (dateStr) {
+        try {
+          const d = new Date(dateStr);
+          el.textContent = d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
+        } catch (e) {}
+      }
+    });
+  });
+</script>
+
+{{ template "layouts/footer.tmpl" . }}
+{{ end }}

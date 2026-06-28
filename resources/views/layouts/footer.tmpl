@@ -1,0 +1,53 @@
+{{ define "layouts/footer.tmpl" }}
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="logo">
+          <div class="logo-icon">I</div>
+          <span>IMS</span>
+        </div>
+        <p class="footer-desc">
+          Innovation Massive Solutions (IMS) provides professional website development using cutting-edge technologies. 
+          We deliver secure, scalable, and responsive digital solutions to support your business transformation.
+        </p>
+      </div>
+      <div>
+        <h3 class="footer-title">Navigation</h3>
+        <ul class="footer-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/services">Services</a></li>
+          <li><a href="/products">Products & Pricing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="footer-title">Contact Us</h3>
+        <ul class="footer-links" style="color: var(--text-secondary); font-size: 0.95rem;">
+          <li style="margin-bottom: 0.75rem;"><i class="fa-solid fa-envelope" style="color: var(--accent-primary); margin-right: 0.5rem;"></i> contact@ims.com</li>
+          <li style="margin-bottom: 0.75rem;"><i class="fa-solid fa-phone" style="color: var(--accent-primary); margin-right: 0.5rem;"></i> +62 812-3456-7890</li>
+          <li style="margin-bottom: 0.75rem;"><i class="fa-solid fa-location-dot" style="color: var(--accent-primary); margin-right: 0.5rem;"></i> Bandung, Indonesia</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Innovation Massive Solutions (IMS). All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Simple micro-interaction: Auto active navigation links
+    document.addEventListener("DOMContentLoaded", () => {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll(".nav-link");
+      navLinks.forEach(link => {
+        if (link.getAttribute("href") === currentPath) {
+          link.classList.add("active");
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+{{ end }}

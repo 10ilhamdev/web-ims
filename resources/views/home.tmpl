@@ -1,0 +1,72 @@
+{{ define "home.tmpl" }}
+{{ template "layouts/header.tmpl" . }}
+
+<section class="container hero animated">
+  <p class="hero-slogan">Turning Ideas Into Digital Solutions</p>
+  <h1 class="hero-title">Elevate Your Business With <br><span class="gradient-text">Premium Web Development</span></h1>
+  <p class="hero-desc">
+    IMS (Innovation Massive Solutions) designs and engineers high-performance web applications tailored to your business. 
+    Secure, responsive, and crafted using modern technologies like Laravel, React, Vue, Go, and Node.js.
+  </p>
+  <div style="display: flex; gap: 1rem; justify-content: center;">
+    <a href="/products" class="btn btn-primary"><i class="fa-solid fa-rocket"></i> View Our Packages</a>
+    <a href="/services" class="btn btn-secondary">Explore Services</a>
+  </div>
+</section>
+
+<!-- Technologies / Stack Banner -->
+<section class="container" style="margin-bottom: 6rem; text-align: center;">
+  <p style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2rem;">Technologies We Master</p>
+  <div style="display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; font-size: 2rem; color: var(--text-secondary); opacity: 0.7;">
+    <span title="Laravel"><i class="fa-brands fa-laravel"></i></span>
+    <span title="React"><i class="fa-brands fa-react"></i></span>
+    <span title="Vue.js"><i class="fa-brands fa-vuejs"></i></span>
+    <span title="Node.js"><i class="fa-brands fa-node-js"></i></span>
+    <span title="PHP"><i class="fa-brands fa-php"></i></span>
+    <span title="WordPress"><i class="fa-brands fa-wordpress"></i></span>
+    <span title="Python"><i class="fa-brands fa-python"></i></span>
+    <span title="Golang" style="font-family: var(--font-mono); font-size: 1.6rem; font-weight: bold; align-self: center;">Go</span>
+  </div>
+</section>
+
+<!-- Services / Features Summary -->
+<section class="container">
+  <div class="section-header">
+    <h2>Why Partner With IMS?</h2>
+    <p>We build web systems that excel in performance, security, and user experience.</p>
+  </div>
+  
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fa-solid fa-code"></i></div>
+      <h3 class="feature-title">Modern Clean Code</h3>
+      <p class="feature-desc">Utilizing robust software architectures with React, Node.js, and Golang to ensure clean codebase maintainability.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <h3 class="feature-title">Enterprise Security</h3>
+      <p class="feature-desc">We implement top-tier encryption, digital security checks, and safe authentication mechanisms in every project.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fa-solid fa-gauge-high"></i></div>
+      <h3 class="feature-title">High Performance</h3>
+      <p class="feature-desc">Blazing fast page loads with server-side optimizations, content caching, and responsive design systems.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA section -->
+<section class="container" style="margin-bottom: 6rem;">
+  <div class="card" style="background: linear-gradient(135deg, rgba(25, 16, 59, 0.8), rgba(18, 11, 46, 0.8)); text-align: center; border-color: var(--accent-primary); padding: 4rem 2rem; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: var(--accent-primary); filter: blur(100px); opacity: 0.3;"></div>
+    <div style="position: absolute; bottom: -50px; right: -50px; width: 150px; height: 150px; background: var(--accent-secondary); filter: blur(100px); opacity: 0.3;"></div>
+    <h2 style="font-size: 2.25rem; margin-bottom: 1rem;">Ready to Launch Your Digital Venture?</h2>
+    <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 2.5rem; font-size: 1.1rem;">
+      Choose from our pre-packaged web packages or request a completely custom corporate portal built to your specifications.
+    </p>
+    <a href="/products" class="btn btn-primary btn-lg"><i class="fa-solid fa-shopping-cart"></i> Get Started Today</a>
+  </div>
+</section>
+
+{{ template "layouts/footer.tmpl" . }}
+{{ end }}

@@ -1,0 +1,39 @@
+{{ define "layouts/header.tmpl" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IMS - Turning Ideas Into Digital Solutions</title>
+  <link rel="stylesheet" href="/public/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="/" class="logo">
+      <div class="logo-icon">I</div>
+      <span>IMS</span>
+    </a>
+    <nav class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/services" class="nav-link">Services</a>
+      <a href="/products" class="nav-link">Products</a>
+      {{ if .User }}
+        {{ if eq .User.Role "admin" }}
+          <a href="/admin" class="nav-link"><i class="fa-solid fa-gauge"></i> Admin Panel</a>
+        {{ else }}
+          <a href="/orders" class="nav-link"><i class="fa-solid fa-list"></i> My Orders</a>
+        {{ end }}
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Hi, {{ .User.Name }}</span>
+        <a href="/logout" class="btn btn-secondary btn-sm"><i class="fa-solid fa-sign-out"></i> Logout</a>
+      {{ else }}
+        <a href="/login" class="nav-link">Login</a>
+        <a href="/register" class="btn btn-primary btn-sm">Register</a>
+      {{ end }}
+    </nav>
+  </header>
+
+  <main class="main-content">
+{{ end }}

@@ -1,0 +1,58 @@
+{{ define "checkout.tmpl" }}
+{{ template "layouts/header.tmpl" . }}
+
+<section class="container">
+  <div class="form-container animated" style="max-width: 600px;">
+    <div style="margin-bottom: 2rem;">
+      <h2 style="font-size: 1.75rem; font-family: var(--font-mono); margin-bottom: 0.5rem;">Confirm Your Order</h2>
+      <p style="color: var(--text-secondary);">You are ordering: <strong style="color: #fff;">{{ .Product.Name }}</strong></p>
+    </div>
+
+    {{ if .Error }}
+      <div class="form-alert form-alert-danger">
+        <i class="fa-solid fa-triangle-exclamation" style="margin-right: 0.5rem;"></i> {{ .Error }}
+      </div>
+    {{ end }}
+
+    <!-- Product Summary Card -->
+    <div class="card" style="background: rgba(255,255,255,0.02); margin-bottom: 2rem; border-color: var(--border-color);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span style="font-weight: 600;">Package Price</span>
+        <span style="color: var(--accent-secondary); font-family: var(--font-mono); font-weight: 700; font-size: 1.25rem;">
+          Rp <span class="price-format" data-price="{{ .Product.Price }}">{{ .Product.Price }}</span>
+        </span>
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-secondary);">{{ .Product.Description }}</p>
+    </div>
+
+    <form action="/checkout/{{ .Product.ID }}" method="POST">
+      <div class="form-group">
+        <label for="requirements" class="form-label">Project Requirements & Brief</label>
+        <textarea id="requirements" name="requirements" rows="6" class="form-control" 
+          placeholder="Please describe your business type, preferences for branding/colors, main pages needed, and any references you like..." required></textarea>
+      </div>
+
+      <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <a href="/products" class="btn btn-secondary" style="flex: 1; justify-content: center;">Cancel</a>
+        <button type="submit" class="btn btn-primary" style="flex: 2; justify-content: center;">
+          <i class="fa-solid fa-file-invoice-dollar"></i> Place Order & Continue
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Format prices nicely in IDR currency
+    document.querySelectorAll('.price-format').forEach(el => {
+      const val = parseFloat(el.getAttribute('data-price'));
+      if (!isNaN(val)) {
+        el.textContent = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(val);
+      }
+    });
+  });
+</script>
+
+{{ template "layouts/footer.tmpl" . }}
+{{ end }}

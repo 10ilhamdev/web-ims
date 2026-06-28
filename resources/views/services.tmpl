@@ -1,0 +1,71 @@
+{{ define "services.tmpl" }}
+{{ template "layouts/header.tmpl" . }}
+
+<section class="container animated" style="padding-top: 4rem; padding-bottom: 6rem;">
+  <div class="section-header">
+    <p class="hero-slogan">Our Expertise</p>
+    <h2>Comprehensive Tech Stack & Services</h2>
+    <p>We leverage top-tier frameworks and cloud infrastructures to craft robust solutions for business scale.</p>
+  </div>
+
+  <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));">
+    <div class="feature-card">
+      <div class="feature-icon" style="color: #ff2d20;"><i class="fa-brands fa-laravel"></i></div>
+      <h3 class="feature-title">Laravel Development</h3>
+      <p class="feature-desc">Building modular, database-driven enterprise applications. Perfect for portals, administrative panels, and robust backend APIs.</p>
+    </div>
+    
+    <div class="feature-card">
+      <div class="feature-icon" style="color: #61dbfb;"><i class="fa-brands fa-react"></i></div>
+      <h3 class="feature-title">React & SPA Platforms</h3>
+      <p class="feature-desc">High-performance client dashboards, dynamic interfaces, and single-page apps (SPA) using Next.js and custom state management.</p>
+    </div>
+    
+    <div class="feature-card">
+      <div class="feature-icon" style="color: #41b883;"><i class="fa-brands fa-vuejs"></i></div>
+      <h3 class="feature-title">Vue.js & Nuxt.js Apps</h3>
+      <p class="feature-desc">Interactive user experiences with reactive frontends. Rapid prototyping and seamless web integration services.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="color: #68a063;"><i class="fa-brands fa-node-js"></i></div>
+      <h3 class="feature-title">Node.js Server Architectures</h3>
+      <p class="feature-desc">Scalable RESTful & GraphQL APIs, real-time communication servers (WebSockets), and microservices setups.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="color: #3776ab;"><i class="fa-brands fa-python"></i></div>
+      <h3 class="feature-title">Python Automation & AI</h3>
+      <p class="feature-desc">Data processing pipelines, machine learning integration, business intelligence analytics, and background automation systems.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="color: #21759b;"><i class="fa-brands fa-wordpress"></i></div>
+      <h3 class="feature-title">WordPress Premium Portals</h3>
+      <p class="feature-desc">Custom landing pages, premium corporate websites, blogs, and content systems with optimal speed and security tuning.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="color: #00bcd4;"><i class="fa-solid fa-cloud"></i></div>
+      <h3 class="feature-title">Cloud Infrastructure</h3>
+      <p class="feature-desc">Docker orchestration, AWS/GCP deployments, continuous integration and delivery (CI/CD) pipelines, and server monitoring.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="color: #e91e63;"><i class="fa-solid fa-lock"></i></div>
+      <h3 class="feature-title">Security & Cryptography</h3>
+      <p class="feature-desc">End-to-end encryption, digital signature logic, secure database auditing, and security compliance assessments.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 4rem; text-align: center; border-color: rgba(255,255,255,0.05); padding: 3rem;">
+    <h3 style="font-size: 1.75rem; margin-bottom: 1rem; font-family: var(--font-mono);">Have a Custom Project in Mind?</h3>
+    <p style="color: var(--text-secondary); max-width: 700px; margin: 0 auto 2rem;">
+      If your needs fall outside our preconfigured packages, we can draft a custom solution blueprint designed around your target architecture and KPIs.
+    </p>
+    <a href="mailto:contact@ims.com" class="btn btn-primary"><i class="fa-solid fa-envelope"></i> Contact Our Architects</a>
+  </div>
+</section>
+
+{{ template "layouts/footer.tmpl" . }}
+{{ end }}
