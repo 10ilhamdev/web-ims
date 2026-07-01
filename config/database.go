@@ -4,13 +4,14 @@ import (
 	"github.com/goravel/framework/contracts/database/driver"
 	postgresfacades "github.com/goravel/postgres/facades"
 	sqlitefacades "github.com/goravel/sqlite/facades"
+	mysqlfacades "github.com/goravel/mysql/facades"
 	"ims/app/facades"
 )
 
 func init() {
 	config := facades.Config()
 	config.Add("database", map[string]any{
-		"default": config.Env("DB_CONNECTION", "sqlite"),
+		"default": config.Env("DB_CONNECTION", "mysql"),
 		// Database connections
 		"connections": map[string]any{
 			"postgres": map[string]any{
@@ -31,6 +32,20 @@ func init() {
 				"database": config.Env("DB_DATABASE", "database/database.sqlite"),
 				"via": func() (driver.Driver, error) {
 					return sqlitefacades.Sqlite("sqlite")
+				},
+			},
+			"mysql": map[string]any{
+				"host":      config.Env("DB_HOST", "localhost"),
+				"port":      config.Env("DB_PORT", "3306"),
+				"database":  config.Env("DB_DATABASE", "ims"),
+				"username":  config.Env("DB_USERNAME", "root"),
+				"password":  config.Env("DB_PASSWORD", ""),
+				"charset":   "utf8mb4",
+				"collation": "utf8mb4_unicode_ci",
+				"prefix":    "",
+				"singular":  false,
+				"via": func() (driver.Driver, error) {
+					return mysqlfacades.Mysql("mysql")
 				},
 			},
 		},

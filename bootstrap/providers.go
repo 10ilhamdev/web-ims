@@ -24,6 +24,7 @@ import (
 	"github.com/goravel/gin"
 	"github.com/goravel/postgres"
 	"github.com/goravel/sqlite"
+	"github.com/goravel/mysql"
 )
 
 func Providers() []foundation.ServiceProvider {
@@ -39,6 +40,7 @@ func Providers() []foundation.ServiceProvider {
 		&database.ServiceProvider{},
 		&postgres.ServiceProvider{},
 		&sqlite.ServiceProvider{},
+		&mysql.ServiceProvider{},
 		&auth.ServiceProvider{},
 		&crypt.ServiceProvider{},
 		&queue.ServiceProvider{},

@@ -1,39 +1,88 @@
 {{ define "layouts/header.tmpl" }}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IMS - Turning Ideas Into Digital Solutions</title>
-  <link rel="stylesheet" href="/public/css/style.css">
+  <link rel="stylesheet" href="/public/css/style.css?v=36">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    // Initialize Theme immediately to prevent flash
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+      document.documentElement.classList.add('light-theme');
+    }
+
+    // Dynamic Navigation Active Link Highlight
+    document.addEventListener("DOMContentLoaded", () => {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll(".nav-links .nav-link");
+      navLinks.forEach(link => {
+        const href = link.getAttribute("href");
+        if (href === currentPath) {
+          link.classList.add("active");
+        } else if (currentPath.startsWith(href) && href !== "/") {
+          link.classList.add("active");
+        }
+      });
+    });
+  </script>
 </head>
+
 <body>
+  <!-- Futuristic Dynamic Dot Matrix Wave Background -->
+  <div class="futuristic-dot-grid"></div>
+
+
+
+  <!-- Futuristic Glowing Particles Background -->
+  <div class="futuristic-bubble-1"></div>
+  <div class="futuristic-bubble-2"></div>
+  <div class="futuristic-bubble-3"></div>
+  <div class="futuristic-bubble-4"></div>
 
   <!-- Navbar -->
   <header class="navbar">
     <a href="/" class="logo">
-      <div class="logo-icon">I</div>
+      <img src="/public/img/logo_ims.png" alt="IMS Logo" onerror="this.style.display='none';">
       <span>IMS</span>
     </a>
+
     <nav class="nav-links">
-      <a href="/" class="nav-link">Home</a>
-      <a href="/services" class="nav-link">Services</a>
-      <a href="/products" class="nav-link">Products</a>
+      <a href="/" class="nav-link" data-translate="nav_home">Home</a>
+      <a href="/services" class="nav-link" data-translate="nav_services">Services</a>
+      <a href="/products" class="nav-link" data-translate="nav_products">Products</a>
+
       {{ if .User }}
-        {{ if eq .User.Role "admin" }}
-          <a href="/admin" class="nav-link"><i class="fa-solid fa-gauge"></i> Admin Panel</a>
-        {{ else }}
-          <a href="/orders" class="nav-link"><i class="fa-solid fa-list"></i> My Orders</a>
-        {{ end }}
-        <span style="color: var(--text-muted); font-size: 0.9rem;">Hi, {{ .User.Name }}</span>
-        <a href="/logout" class="btn btn-secondary btn-sm"><i class="fa-solid fa-sign-out"></i> Logout</a>
+      {{ if eq .User.Role "admin" }}
+      <a href="/admin" class="nav-link"><i class="fa-solid fa-gauge"></i> Admin Panel</a>
       {{ else }}
-        <a href="/login" class="nav-link">Login</a>
-        <a href="/register" class="btn btn-primary btn-sm">Register</a>
+      <a href="/orders" class="nav-link"><i class="fa-solid fa-list"></i> My Orders</a>
       {{ end }}
+      <span style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500;" data-translate="hi_user"
+        data-username="{{ .User.Name }}">Hi, {{ .User.Name }}</span>
+      <a href="/logout" class="btn btn-secondary btn-sm"><i class="fa-solid fa-sign-out"></i> Logout</a>
+      {{ else }}
+      <a href="/login" class="nav-link" data-translate="nav_login">Login</a>
+      <a href="/register" class="btn btn-primary btn-sm" data-translate="nav_register">Register</a>
+      {{ end }}
+
     </nav>
+
+    <!-- Interface Controls -->
+    <div class="interface-controls">
+      <button class="btn-icon" id="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+        <i class="fa-solid fa-sun" style="display:none;" id="sun-icon"></i>
+        <i class="fa-solid fa-moon" id="moon-icon"></i>
+      </button>
+      <select class="select-lang" id="lang-select" onchange="changeLanguage(this.value)" title="Change Language">
+        <option value="id">ID</option>
+        <option value="en">EN</option>
+      </select>
+    </div>
   </header>
 
   <main class="main-content">
-{{ end }}
+    {{ end }}

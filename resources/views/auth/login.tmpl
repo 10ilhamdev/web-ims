@@ -9,15 +9,15 @@
     </div>
 
     {{ if .Error }}
-      <div class="form-alert form-alert-danger">
-        <i class="fa-solid fa-triangle-exclamation" style="margin-right: 0.5rem;"></i> {{ .Error }}
-      </div>
+    <div class="form-alert form-alert-danger">
+      <i class="fa-solid fa-triangle-exclamation" style="margin-right: 0.5rem;"></i> {{ .Error }}
+    </div>
     {{ end }}
 
     {{ if .Success }}
-      <div class="form-alert form-alert-success">
-        <i class="fa-solid fa-circle-check" style="margin-right: 0.5rem;"></i> {{ .Success }}
-      </div>
+    <div class="form-alert form-alert-success">
+      <i class="fa-solid fa-circle-check" style="margin-right: 0.5rem;"></i> {{ .Success }}
+    </div>
     {{ end }}
 
     <form action="/login" method="POST">
@@ -37,7 +37,8 @@
     </form>
 
     <div style="text-align: center; margin-top: 2rem; color: var(--text-secondary); font-size: 0.95rem;">
-      Don't have an account? <a href="/register" style="color: var(--accent-primary); font-weight: 600;">Register here</a>
+      Don't have an account? <a href="/register" style="color: var(--accent-primary); font-weight: 600;">Register
+        here</a>
     </div>
   </div>
 </section>
