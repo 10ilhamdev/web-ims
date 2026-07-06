@@ -17,22 +17,29 @@ func NewGuestController() *GuestController {
 // Index serves landing page
 func (r *GuestController) Index(ctx http.Context) http.Response {
 	user := GetCurrentUser(ctx)
+	idJson, enJson := GetCmsTranslationsJson(ctx)
 	return ctx.Response().View().Make("home.tmpl", map[string]any{
-		"User": user,
+		"User":                  user,
+		"CmsTranslationsIDJson": idJson,
+		"CmsTranslationsENJson": enJson,
 	})
 }
 
 // Services serves services detail page
 func (r *GuestController) Services(ctx http.Context) http.Response {
 	user := GetCurrentUser(ctx)
+	idJson, enJson := GetCmsTranslationsJson(ctx)
 	return ctx.Response().View().Make("services.tmpl", map[string]any{
-		"User": user,
+		"User":                  user,
+		"CmsTranslationsIDJson": idJson,
+		"CmsTranslationsENJson": enJson,
 	})
 }
 
 // Products serves product packages page
 func (r *GuestController) Products(ctx http.Context) http.Response {
 	user := GetCurrentUser(ctx)
+	idJson, enJson := GetCmsTranslationsJson(ctx)
 	
 	var products []models.Product
 	err := facades.Orm().Query().Get(&products)
@@ -56,7 +63,9 @@ func (r *GuestController) Products(ctx http.Context) http.Response {
 	}
 
 	return ctx.Response().View().Make("products.tmpl", map[string]any{
-		"User":     user,
-		"Products": viewProducts,
+		"User":                  user,
+		"Products":              viewProducts,
+		"CmsTranslationsIDJson": idJson,
+		"CmsTranslationsENJson": enJson,
 	})
 }

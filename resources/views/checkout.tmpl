@@ -1,5 +1,5 @@
 {{ define "checkout.tmpl" }}
-{{ template "layouts/header.tmpl" . }}
+{{ template "layouts/guest_header" . }}
 
 <section class="container">
   <div class="form-container animated" style="max-width: 600px;">
@@ -19,7 +19,11 @@
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
         <span style="font-weight: 600;">Package Price</span>
         <span style="color: var(--accent-secondary); font-family: var(--font-mono); font-weight: 700; font-size: 1.25rem;">
-          Rp <span class="price-format" data-price="{{ .Product.Price }}">{{ .Product.Price }}</span>
+          {{ if gt .Product.Price 0.0 }}
+            Rp <span class="price-format" data-price="{{ .Product.Price }}">{{ .Product.Price }}</span>
+          {{ else }}
+            Didiskusikan (TBD)
+          {{ end }}
         </span>
       </div>
       <p style="font-size: 0.9rem; color: var(--text-secondary);">{{ .Product.Description }}</p>
@@ -53,6 +57,5 @@
     });
   });
 </script>
-
-{{ template "layouts/footer.tmpl" . }}
+{{ template "layouts/guest_footer" . }}
 {{ end }}

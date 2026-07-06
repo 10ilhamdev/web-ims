@@ -1,5 +1,31 @@
 {{ define "products.tmpl" }}
-{{ template "layouts/header.tmpl" . }}
+{{ template "layouts/guest_header" . }}
+
+<style>
+.discount-pill {
+  background: linear-gradient(135deg, #ff2a5f 0%, #ff7e40 100%);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 900;
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 10px rgba(255, 42, 95, 0.35);
+  animation: discount-pulse 2s infinite alternate;
+  display: inline-block;
+}
+@keyframes discount-pulse {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  100% {
+    transform: scale(1.08);
+    filter: brightness(1.15);
+    box-shadow: 0 6px 15px rgba(255, 42, 95, 0.55);
+  }
+}
+</style>
 
 <section class="container animated" style="padding-top: 4rem; padding-bottom: 6rem;">
   <div class="section-header reveal reveal-up">
@@ -17,9 +43,24 @@
       {{ end }}
       <h3 class="product-name" data-translate="product_name_{{ .ID }}">{{ .Name }}</h3>
 
-      <div class="product-price-box">
-        <span class="product-currency">Rp</span>
-        <span class="product-price price-format" data-price="{{ .Price }}">{{ .Price }}</span>
+      <div class="product-price-box" style="align-items: center; flex-wrap: wrap; gap: 0.75rem; min-height: 4rem; margin: 1.5rem 0;">
+        {{ if gt .Price 0.0 }}
+          <div style="display: flex; align-items: baseline;">
+            <span class="product-currency">Rp</span>
+            <span class="product-price price-format" data-price="{{ .Price }}">{{ .Price }}</span>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem;">
+            {{ if eq .ID 1 }}
+              <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.95rem; font-weight: 500;">Rp 2.500.000</span>
+              <span class="discount-pill">HEMAT 40%</span>
+            {{ else if eq .ID 2 }}
+              <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.95rem; font-weight: 500;">Rp 8.000.000</span>
+              <span class="discount-pill">HEMAT 44%</span>
+            {{ end }}
+          </div>
+        {{ else }}
+          <span class="product-price" style="font-size: 1.8rem; font-family: inherit;" data-translate="product_price_negotiable">Hubungi Kami</span>
+        {{ end }}
       </div>
 
       <p class="product-description" data-translate="product_desc_{{ .ID }}">{{ .Description }}</p>
@@ -39,7 +80,11 @@
       </ul>
 
       <a href="/checkout/{{ .ID }}" class="btn btn-primary" style="justify-content: center; width: 100%;">
-        <i class="fa-solid fa-shopping-cart"></i> <span data-translate="products_btn_order">Order Now</span>
+        {{ if gt .Price 0.0 }}
+          <i class="fa-solid fa-shopping-cart"></i> <span data-translate="products_btn_order">Order Now</span>
+        {{ else }}
+          <i class="fa-solid fa-comments"></i> <span data-translate="products_btn_discuss">Hubungi Kami</span>
+        {{ end }}
       </a>
     </div>
     {{ end }}
@@ -70,5 +115,5 @@
   });
 </script>
 
-{{ template "layouts/footer.tmpl" . }}
+{{ template "layouts/guest_footer" . }}
 {{ end }}

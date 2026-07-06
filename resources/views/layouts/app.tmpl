@@ -1,0 +1,580 @@
+{{ define "layouts/app_header" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel | IMS Control Panel</title>
+  <link rel="stylesheet" href="/public/css/style.css?v=100">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- DataTables CSS (Included only in admin panel) -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+  <style>
+    /* Spacing fixes for DataTables filters */
+    .dataTables_wrapper {
+      color: var(--text-primary) !important;
+      font-family: inherit;
+    }
+    table.dataTable {
+      border-collapse: collapse !important;
+      background: var(--bg-secondary) !important;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 1.5rem !important;
+      margin-bottom: 1.5rem !important;
+      border: 1px solid var(--border-color) !important;
+    }
+    table.dataTable thead th {
+      background: rgba(255, 255, 255, 0.02) !important;
+      color: var(--text-primary) !important;
+      font-weight: 600 !important;
+      padding: 1.25rem 1rem !important;
+      border-bottom: 2px solid var(--border-color) !important;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+    table.dataTable tbody td {
+      padding: 1.25rem 1rem !important;
+      background: none !important;
+      border-bottom: 1px solid var(--border-color) !important;
+      color: var(--text-primary) !important;
+    }
+    .dataTables_filter input {
+      background: var(--bg-primary) !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 8px !important;
+      padding: 0.6rem 1rem !important;
+      color: var(--text-primary) !important;
+      margin-left: 0.5rem !important;
+    }
+    .dataTables_length select {
+      background: var(--bg-primary) !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 8px !important;
+      padding: 0.5rem 1.5rem !important;
+      color: var(--text-primary) !important;
+    }
+    .dataTables_length, .dataTables_filter {
+      margin-bottom: 1.75rem !important;
+    }
+    .dataTables_info {
+      color: var(--text-secondary) !important;
+      font-size: 0.9rem;
+    }
+    .dataTables_paginate .paginate_button {
+      background: var(--bg-primary) !important;
+      color: var(--text-primary) !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 8px !important;
+      padding: 0.5rem 1rem !important;
+      margin: 0 0.25rem;
+      transition: all 0.2s ease;
+    }
+    .dataTables_paginate .paginate_button.current, .dataTables_paginate .paginate_button.current:hover {
+      background: var(--accent-primary) !important;
+      color: #fff !important;
+      border-color: var(--accent-primary) !important;
+    }
+    .dataTables_paginate .paginate_button:hover {
+      background: rgba(37, 99, 235, 0.08) !important;
+      color: var(--text-primary) !important;
+    }
+    .light-theme table.dataTable thead th {
+      background: var(--bg-tertiary) !important;
+    }
+  </style>
+</head>
+<body style="background-image: none; background-color: var(--bg-primary);">
+  <div class="admin-layout">
+    
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" style="background: var(--bg-secondary); border-right: 1px solid var(--border-color); width: 280px; transition: var(--transition-smooth); display: flex; flex-direction: column;">
+      <button class="sidebar-collapse-btn" onclick="toggleSidebar()" title="Collapse Sidebar">
+        <i class="fa-solid fa-chevron-left" id="collapse-icon"></i>
+      </button>
+      
+      <div style="padding: 2rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 1rem;">
+        <div style="width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem; color: #fff; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);">
+          {{ if .User }}
+            {{ printf "%.1s" .User.Name }}
+          {{ else }}
+            A
+          {{ end }}
+        </div>
+        <div>
+          <div style="font-weight: 600; font-size: 0.95rem;">{{ if .User }}{{ .User.Name }}{{ else }}Admin{{ end }}</div>
+          <div style="color: var(--accent-secondary); font-size: 0.8rem; font-weight: 500; text-transform: uppercase;">{{ if .User }}{{ .User.Role }}{{ else }}User{{ end }}</div>
+        </div>
+      </div>
+      
+      <ul class="sidebar-menu">
+        {{ if eq .User.Role "admin" }}
+          <li>
+            <a href="/admin"><i class="fa-solid fa-gauge"></i> <span data-translate="menu_dashboard">Dashboard</span></a>
+          </li>
+          
+          <li>
+            <a href="/admin/cms"><i class="fa-solid fa-file-pen"></i> <span data-translate="menu_cms">CMS Pages</span></a>
+          </li>
+          
+        <li class="has-submenu">
+            <a href="javascript:void(0)" onclick="toggleSubmenu(this)">
+              <i class="fa-solid fa-users-gear"></i> <span data-translate="menu_users_roles">User & Roles</span>
+              <i class="fa-solid fa-chevron-down submenu-arrow"></i>
+            </a>
+            <ul class="sidebar-submenu" style="display: none;">
+              <li>
+                <a href="/admin/users"><i class="fa-solid fa-user-shield"></i> <span data-translate="menu_users">User Management</span></a>
+              </li>
+              <li>
+                <a href="/admin/roles"><i class="fa-solid fa-database"></i> <span data-translate="menu_roles">Role & DB Manager</span></a>
+              </li>
+            </ul>
+        </li>
+        {{ else }}
+          <li>
+            <a href="/orders"><i class="fa-solid fa-list-check"></i> <span data-translate="menu_orders">My Project Orders</span></a>
+          </li>
+        {{ end }}
+        <li>
+          <a href="/"><i class="fa-solid fa-globe"></i> <span data-translate="menu_website">Main Website</span></a>
+        </li>
+        <li>
+          <a href="/products"><i class="fa-solid fa-list-check"></i> <span data-translate="menu_packages">Pricing Packages</span></a>
+        </li>
+        <li style="margin-top: 3rem;">
+          <a href="/logout" class="btn btn-danger btn-sm" style="color: #fff; justify-content: center; gap: 0.5rem;">
+            <i class="fa-solid fa-sign-out"></i> <span>Logout</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Admin Content -->
+    <main class="admin-content" style="flex: 1; padding: 2.5rem; overflow-y: auto;">
+      
+      <!-- Top Navbar -->
+      <div class="admin-navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.15); font-family: inherit; position: relative; z-index: 1000;">
+        <div style="font-weight: 700; font-family: var(--font-mono); color: var(--accent-secondary); font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-cube"></i> <span data-translate="control_panel">IMS CONTROL PANEL</span>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+          <!-- Interface Controls -->
+          <div class="interface-controls" style="display: flex; align-items: center; gap: 0.75rem;">
+            <button class="btn-icon" id="admin-theme-toggle" onclick="toggleTheme()" title="Toggle Theme" style="border: 1px solid var(--border-color); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-primary); transition: var(--transition-smooth);">
+              <i class="fa-solid fa-sun" style="display:none;" id="sun-icon"></i>
+              <i class="fa-solid fa-moon" id="moon-icon"></i>
+            </button>
+            <select class="select-lang" id="lang-select" onchange="changeLanguage(this.value)" title="Change Language" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 1rem; color: var(--text-primary); font-family: inherit; font-size: 0.9rem; cursor: pointer; outline: none; transition: var(--transition-smooth);">
+              <option value="id">ID</option>
+              <option value="en">EN</option>
+            </select>
+          </div>
+
+          <!-- User Profile Dropdown -->
+          <div class="user-dropdown-container" style="position: relative; display: inline-block;">
+            <button class="user-dropdown-trigger" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 0.75rem; color: var(--text-primary); padding: 0.5rem 1rem; border-radius: 10px; transition: var(--transition-smooth);" onclick="toggleAdminUserDropdown(event)">
+              <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem;">
+                {{ if .User }}{{ printf "%.1s" .User.Name }}{{ else }}A{{ end }}
+              </div>
+              <span style="font-size: 0.9rem; font-weight: 600;">{{ if .User }}{{ .User.Name }}{{ else }}Admin{{ end }}</span>
+              <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; opacity: 0.7;"></i>
+            </button>
+
+            <div class="user-dropdown-menu" id="adminUserDropdownMenu" style="display: none; position: absolute; right: 0; top: 120%; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; min-width: 240px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 1000; padding: 0.5rem 0; overflow: hidden; animation: dropdownFadeIn 0.2s ease;">
+              <div style="padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0.25rem;">
+                <div style="font-weight: 600; color: var(--text-primary); font-size: 0.9rem;">{{ if .User }}{{ .User.Name }}{{ else }}Admin{{ end }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ if .User }}{{ .User.Email }}{{ else }}admin@ims.com{{ end }}</div>
+              </div>
+              <a href="/profile" class="dropdown-item">
+                <i class="fa-solid fa-id-card" style="width: 16px; color: var(--accent-primary);"></i> <span data-translate="menu_profile">Data Profil</span>
+              </a>
+              <a href="/profile/password" class="dropdown-item">
+                <i class="fa-solid fa-key" style="width: 16px; color: var(--accent-secondary);"></i> <span data-translate="menu_password">Password</span>
+              </a>
+              <a href="/profile/activity" class="dropdown-item">
+                <i class="fa-solid fa-clock-rotate-left" style="width: 16px; color: #10b981;"></i> <span data-translate="menu_activity">Riwayat Aktivitas</span>
+              </a>
+              <a href="/logout" class="dropdown-item logout-item">
+                <i class="fa-solid fa-sign-out" style="width: 16px;"></i> <span data-translate="menu_logout">Keluar (Logout)</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+{{ end }}
+
+{{ define "layouts/app_footer" }}
+    </main>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script>
+    // Translations Dictionary for Internal Panel
+    const adminTranslations = {
+      id: {
+        control_panel: "IMS PANEL KONTROL",
+        profile_title: "Data Profil",
+        profile_desc: "Kelola data informasi akun pribadi Anda di bawah ini.",
+        full_name: "Nama Lengkap",
+        email_address: "Alamat Email",
+        btn_edit_profile: "Edit Data Diri",
+        btn_cancel: "Batal",
+        btn_save_changes: "Simpan Perubahan",
+        
+        password_title: "Perbarui Password",
+        password_desc: "Jaga keamanan akun Anda dengan mengganti kata sandi secara berkala.",
+        current_password: "Kata Sandi Saat Ini",
+        new_password: "Kata Sandi Baru",
+        btn_update_password: "Perbarui Password",
+        
+        activity_title: "Riwayat Aktivitas",
+        activity_desc: "Pantau log login, aktivitas sistem, dan akses perangkat Anda di sini.",
+        col_time: "Waktu",
+        col_activity: "Aktivitas",
+        col_device: "Perangkat",
+        col_ip: "IP Address",
+        no_activity: "Belum ada riwayat aktivitas yang tercatat.",
+        
+        menu_dashboard: "Dashboard",
+        menu_users_roles: "Pengguna & Peran",
+        menu_users: "Manajemen Pengguna",
+        menu_cms: "Halaman CMS",
+        menu_roles: "Manajemen Peran & DB",
+        menu_website: "Website Utama",
+        menu_packages: "Paket Layanan",
+        menu_orders: "Pesanan Proyek Saya",
+        menu_profile: "Data Profil",
+        menu_password: "Ubah Password",
+        menu_activity: "Riwayat Aktivitas",
+        menu_logout: "Keluar",
+        
+        dash_title: "Ikhtisar & Manajemen",
+        dash_desc: "Selamat datang kembali, administrator. Kelola operasi penjualan di sini.",
+        dash_total_orders: "Total Pesanan",
+        dash_active_projects: "Proyek Aktif",
+        dash_total_revenue: "Total Pendapatan",
+        dash_registered_clients: "Klien Terdaftar",
+        dash_orders_list: "Daftar Pesanan Klien",
+        col_order_id: "ID Pesanan",
+        col_client_name: "Nama Klien",
+        col_package_name: "Nama Paket",
+        col_price: "Harga",
+        col_status: "Status",
+        col_update_status: "Perbarui Status",
+        col_placed_date: "Tanggal Dibuat",
+        
+        users_title: "Manajemen Pengguna",
+        users_desc: "Kelola administrator platform dan klien di sini.",
+        users_directory: "Direktori Pengguna",
+        users_add_new: "Tambah Pengguna Baru",
+        password_label: "Password / Kata Sandi",
+        users_role: "Peran Sistem",
+        users_role_client: "Klien",
+        users_role_admin: "Administrator",
+        users_create_btn: "Buat Akun",
+        users_list: "Daftar Pengguna Terdaftar",
+        col_role: "Peran",
+        col_actions: "Aksi",
+        users_edit: "Ubah",
+        users_delete: "Hapus",
+        
+        cms_title: "Manajemen CMS",
+        cms_desc: "Kelola konten dan bagian dari semua halaman publik (guest) di sini.",
+        cms_templates: "Templat Halaman CMS",
+        cms_add_new: "Tambah Halaman CMS Baru",
+        cms_page_name: "Nama Halaman",
+        cms_page_type: "Tipe / Kunci Halaman",
+        cms_sort_order: "Urutan Pengurutan",
+        cms_create_btn: "Buat Halaman",
+        cms_directory: "Direktori Halaman CMS",
+        col_page_name: "Nama Halaman",
+        col_type_key: "Kunci Tipe",
+        col_order: "Urutan",
+        cms_manage_content: "Kelola Konten",
+        
+        cms_content: "Konten",
+        cms_content_desc: "Perbarui elemen blok konten untuk templat halaman ini.",
+        cms_back: "Kembali ke Halaman CMS",
+        cms_add_block: "Tambah Blok Konten Baru",
+        cms_section_key: "Kunci Bagian Konten",
+        cms_block_title: "Judul / Heading",
+        cms_block_subtitle: "Sub-judul / Keterangan",
+        cms_block_body: "Teks Utama / Konten",
+        cms_save_block: "Simpan Blok Konten",
+        cms_blocks_list: "Daftar Blok Konten Bagian Halaman",
+        col_section_key: "Kunci Bagian",
+        col_heading: "Heading",
+        col_subheading: "Sub-heading",
+        col_body: "Isi Konten",
+        
+        type_home: "Beranda",
+        type_services: "Layanan",
+        type_products: "Produk"
+      },
+      en: {
+        control_panel: "IMS CONTROL PANEL",
+        profile_title: "Profile Data",
+        profile_desc: "Manage your personal account details below.",
+        full_name: "Full Name",
+        email_address: "Email Address",
+        btn_edit_profile: "Edit Profile",
+        btn_cancel: "Cancel",
+        btn_save_changes: "Save Changes",
+        
+        password_title: "Update Password",
+        password_desc: "Maintain your account security by changing password regularly.",
+        current_password: "Current Password",
+        new_password: "New Password",
+        btn_update_password: "Update Password",
+        
+        activity_title: "Activity History",
+        activity_desc: "Monitor your log logins, system actions, and device accesses here.",
+        col_time: "Time",
+        col_activity: "Activity",
+        col_device: "Device",
+        col_ip: "IP Address",
+        no_activity: "No activity logs recorded yet.",
+        
+        menu_dashboard: "Dashboard",
+        menu_users_roles: "Users & Roles",
+        menu_users: "User Management",
+        menu_cms: "CMS Pages",
+        menu_roles: "Role & DB Manager",
+        menu_website: "Main Website",
+        menu_packages: "Pricing Packages",
+        menu_orders: "My Project Orders",
+        menu_profile: "Data Profile",
+        menu_password: "Password",
+        menu_activity: "Activity Logs",
+        menu_logout: "Logout",
+        
+        dash_title: "Overview & Management",
+        dash_desc: "Welcome back, administrator. Manage sales operations here.",
+        dash_total_orders: "Total Orders",
+        dash_active_projects: "Active Projects",
+        dash_total_revenue: "Total Revenue",
+        dash_registered_clients: "Registered Clients",
+        dash_orders_list: "Client Orders List",
+        col_order_id: "Order ID",
+        col_client_name: "Client Name",
+        col_package_name: "Package Name",
+        col_price: "Price",
+        col_status: "Status",
+        col_update_status: "Update Status",
+        col_placed_date: "Placed Date",
+        
+        users_title: "User Management",
+        users_desc: "Manage platform administrators and clients here.",
+        users_directory: "User Directory",
+        users_add_new: "Add New User",
+        password_label: "Password",
+        users_role: "System Role",
+        users_role_client: "Client",
+        users_role_admin: "Administrator",
+        users_create_btn: "Create Account",
+        users_list: "Registered Users List",
+        col_role: "Role",
+        col_actions: "Actions",
+        users_edit: "Edit",
+        users_delete: "Delete",
+        
+        cms_title: "CMS Management",
+        cms_desc: "Manage content and sections of all guest-facing pages here.",
+        cms_templates: "CMS Page Templates",
+        cms_add_new: "Add New CMS Page",
+        cms_page_name: "Page Name",
+        cms_page_type: "Page Type / Key",
+        cms_sort_order: "Sort Order",
+        cms_create_btn: "Create Page",
+        cms_directory: "CMS Pages Directory",
+        col_page_name: "Page Name",
+        col_type_key: "Type Key",
+        col_order: "Order",
+        cms_manage_content: "Manage Content",
+        
+        cms_content: "Content",
+        cms_content_desc: "Update content elements for the page template.",
+        cms_back: "Back to CMS Pages",
+        cms_add_block: "Add New Content Block",
+        cms_section_key: "Content Section Key",
+        cms_block_title: "Title / Heading",
+        cms_block_subtitle: "Sub-heading / Caption",
+        cms_block_body: "Body Text / Content",
+        cms_save_block: "Save Content Block",
+        cms_blocks_list: "Page Section Content Blocks",
+        col_section_key: "Section Key",
+        col_heading: "Heading",
+        col_subheading: "Sub-heading",
+        col_body: "Body Content",
+        
+        type_home: "Home",
+        type_services: "Services",
+        type_products: "Products"
+      }
+    };
+
+    function toggleAdminUserDropdown(event) {
+      event.stopPropagation();
+      const menu = document.getElementById('adminUserDropdownMenu');
+      if (menu) {
+        const isVisible = menu.style.display === 'block';
+        menu.style.display = isVisible ? 'none' : 'block';
+      }
+    }
+
+    // Close dropdown on click outside
+    document.addEventListener('click', () => {
+      const menu = document.getElementById('adminUserDropdownMenu');
+      if (menu) menu.style.display = 'none';
+    });
+
+    // Dark/Light Theme Toggling
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+
+    function toggleTheme() {
+      const isLight = document.documentElement.classList.toggle('light-theme');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      updateThemeIcons();
+    }
+
+    function updateThemeIcons() {
+      const isLight = document.documentElement.classList.contains('light-theme');
+      if (sunIcon && moonIcon) {
+        if (isLight) {
+          sunIcon.style.display = 'inline-block';
+          moonIcon.style.display = 'none';
+        } else {
+          sunIcon.style.display = 'none';
+          moonIcon.style.display = 'inline-block';
+        }
+      }
+    }
+
+    // Translation Function
+    function changeLanguage(lang) {
+      const prevLang = localStorage.getItem('lang');
+      localStorage.setItem('lang', lang);
+      const select = document.getElementById('lang-select');
+      if (select) select.value = lang;
+      applyAdminTranslations(lang);
+      if (prevLang && prevLang !== lang) {
+        window.location.reload();
+      }
+    }
+
+    function applyAdminTranslations(lang) {
+      const dict = adminTranslations[lang] || adminTranslations['id'];
+      document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        if (dict[key]) {
+          if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            el.setAttribute('placeholder', dict[key]);
+          } else {
+            el.textContent = dict[key];
+          }
+        }
+      });
+    }
+
+    // Sidebar Collapse Toggle
+    function toggleSidebar() {
+      const layout = document.querySelector('.admin-layout');
+      const icon = document.getElementById('collapse-icon');
+      if (!layout) return;
+      
+      const isCollapsed = layout.classList.toggle('sidebar-collapsed');
+      localStorage.setItem('sidebar-collapsed', isCollapsed ? 'true' : 'false');
+      
+      if (icon) {
+        if (isCollapsed) {
+          icon.className = 'fa-solid fa-chevron-right';
+        } else {
+          icon.className = 'fa-solid fa-chevron-left';
+        }
+      }
+    }
+
+    // Sidebar Submenu Toggle
+    function toggleSubmenu(el) {
+      const parent = el.closest('.has-submenu');
+      if (!parent) return;
+      
+      const submenu = parent.querySelector('.sidebar-submenu');
+      if (!submenu) return;
+      
+      const isOpen = parent.classList.toggle('open');
+      if (isOpen) {
+        submenu.style.display = 'flex';
+      } else {
+        submenu.style.display = 'none';
+      }
+    }
+
+    // Scroll Reveal Observer
+    const scrollObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        } else {
+          entry.target.classList.remove('visible');
+        }
+      });
+    }, { threshold: 0.05 });
+
+    // Initialize state on load
+    document.addEventListener('DOMContentLoaded', () => {
+      // Theme setup
+      const currentTheme = localStorage.getItem('theme') || 'dark';
+      if (currentTheme === 'light') {
+        document.documentElement.classList.add('light-theme');
+      } else {
+        document.documentElement.classList.remove('light-theme');
+      }
+      updateThemeIcons();
+
+      // Language setup
+      const currentLang = localStorage.getItem('lang') || 'id';
+      changeLanguage(currentLang);
+
+      // Sidebar state restore
+      const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+      const layout = document.querySelector('.admin-layout');
+      const icon = document.getElementById('collapse-icon');
+      if (isCollapsed && layout) {
+        layout.classList.add('sidebar-collapsed');
+        if (icon) icon.className = 'fa-solid fa-chevron-right';
+      }
+
+      // Dynamic Sidebar Active Link Highlight
+      const currentPath = window.location.pathname;
+      const sidebarLinks = document.querySelectorAll(".sidebar-menu a");
+      sidebarLinks.forEach(link => {
+        const href = link.getAttribute("href");
+        if (href === currentPath) {
+          link.closest('li').classList.add("active");
+          const submenu = link.closest('.sidebar-submenu');
+          if (submenu) {
+            submenu.style.display = 'flex';
+            const parentHasSubmenu = submenu.closest('.has-submenu');
+            if (parentHasSubmenu) {
+              parentHasSubmenu.classList.add('open');
+            }
+          }
+        }
+      });
+
+      // Bind scroll reveal to components
+      document.querySelectorAll('.card, .stats-grid, table, form, h1, p, .admin-navbar, .profile-card').forEach(el => {
+        el.classList.add('scroll-reveal');
+        scrollObserver.observe(el);
+      });
+    });
+  </script>
+</body>
+</html>
+{{ end }}

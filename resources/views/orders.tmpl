@@ -1,5 +1,5 @@
 {{ define "orders.tmpl" }}
-{{ template "layouts/header.tmpl" . }}
+{{ template "layouts/guest_header" . }}
 
 <section class="container animated" style="padding-top: 4rem; padding-bottom: 6rem;">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
@@ -80,5 +80,5 @@
   });
 </script>
 
-{{ template "layouts/footer.tmpl" . }}
+{{ template "layouts/guest_footer" . }}
 {{ end }}

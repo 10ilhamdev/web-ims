@@ -1,0 +1,541 @@
+{{ define "admin/roles.tmpl" }}
+{{ template "layouts/app_header" . }}
+      <!-- Top header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+        <div>
+          <h1 style="font-size: 2rem;" data-translate="menu_roles">Role & Database Schema Manager</h1>
+          <p style="color: var(--text-secondary); margin-top: 0.25rem;">Define custom user roles and manage their physical database schemas like phpMyAdmin.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+          <i class="fa-solid fa-plus-circle"></i> <span data-translate="btn_add_role">Create Custom Role</span>
+        </button>
+      </div>
+
+      <!-- Roles DataTable -->
+      <div class="card" style="border-color: var(--border-color); background: var(--bg-secondary); padding: 2rem;">
+        <table id="rolesTable" class="display" style="width:100%">
+          <thead>
+            <tr>
+              <th data-translate="col_role_name">Role Name</th>
+              <th data-translate="col_db_table">Associated DB Table</th>
+              <th data-translate="col_model_name">Model Entity Name</th>
+              <th data-translate="col_fields_count">Fields Count</th>
+              <th style="width: 200px;" data-translate="col_actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .Roles }}
+              <tr>
+                <td style="font-weight: 600; color: var(--text-primary);">{{ .Name }}</td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent-secondary);">{{ .TableName }}</td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--info);">{{ .ModelName }}</td>
+                <td style="font-weight: bold;" class="fields-count-cell" data-fields="{{ .Fields }}">0</td>
+                <td>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-secondary btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; gap: 0.4rem;" 
+                      onclick="onEditClick(this)"
+                      data-id="{{ .ID }}"
+                      data-name="{{ .Name }}"
+                      data-table="{{ .TableName }}"
+                      data-model="{{ .ModelName }}"
+                      data-fields='{{ .Fields }}'
+                      data-relations='{{ .Relations }}'>
+                      <i class="fa-solid fa-edit"></i> Edit
+                    </button>
+                    {{ if and (ne .Name "admin") (ne .Name "client") }}
+                      <form action="/admin/roles/{{ .ID }}/delete" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus role beserta skema tabel ini?');" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
+                      </form>
+                    {{ else }}
+                      <span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; display: flex; align-items: center; padding-left: 0.5rem;">System Protected</span>
+                    {{ end }}
+                  </div>
+                </td>
+              </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+
+  <!-- Create Role Modal -->
+  <div class="role-modal" id="createRoleModal">
+    <div class="role-modal-content" style="max-height: 85vh; overflow-y: auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
+        <h3 style="font-size: 1.35rem;"><i class="fa-solid fa-folder-plus" style="color: var(--accent-primary); margin-right: 0.5rem;"></i> Create Custom Role & Schema</h3>
+        <button style="background:none; border:none; color:var(--text-secondary); font-size: 1.5rem; cursor:pointer;" onclick="closeCreateModal()">&times;</button>
+      </div>
+      
+      <form action="/admin/roles" method="POST" onsubmit="return validateSchemaForm('create')">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label class="form-label">Role Name (Lowercase)</label>
+            <input type="text" name="name" class="form-control" placeholder="e.g. manager" required pattern="[a-z0-9_]+">
+          </div>
+          <div class="form-group">
+            <label class="form-label">DB Table Name</label>
+            <input type="text" name="table_name" class="form-control" placeholder="e.g. managers" required pattern="[a-z0-9_]+">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Go Model Struct Name</label>
+            <input type="text" name="model_name" class="form-control" placeholder="e.g. Manager" required pattern="[A-Za-z0-9_]+">
+          </div>
+        </div>
+
+        <h4 style="margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;"><i class="fa-solid fa-table-columns"></i> Table Fields Schema</h4>
+        <div class="table-responsive">
+          <table class="schema-builder-table">
+            <thead>
+              <tr>
+                <th>Field Name</th>
+                <th>Data Type</th>
+                <th>Length/Values</th>
+                <th>Attributes</th>
+                <th>Relations / Reference Table</th>
+                <th style="width: 50px;"></th>
+              </tr>
+            </thead>
+            <tbody id="createFieldsBody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <button type="button" class="btn btn-secondary btn-sm" onclick="addNewRow('create')" style="margin-bottom: 2rem;">
+          <i class="fa-solid fa-plus-circle"></i> Add Custom Column
+        </button>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.8rem;">
+          <i class="fa-solid fa-save"></i> Save Role & Generate DB Schema
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Role Modal -->
+  <div class="role-modal" id="editRoleModal">
+    <div class="role-modal-content" style="max-height: 85vh; overflow-y: auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
+        <h3 style="font-size: 1.35rem;"><i class="fa-solid fa-pen-to-square" style="color: var(--accent-secondary); margin-right: 0.5rem;"></i> Edit Custom Role & Schema</h3>
+        <button style="background:none; border:none; color:var(--text-secondary); font-size: 1.5rem; cursor:pointer;" onclick="closeEditModal()">&times;</button>
+      </div>
+      
+      <form id="editRoleForm" method="POST" onsubmit="return validateSchemaForm('edit')">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label class="form-label">Role Name (Readonly)</label>
+            <input type="text" id="editRoleName" class="form-control" readonly style="background: rgba(255,255,255,0.02); cursor: not-allowed;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">DB Table Name</label>
+            <input type="text" name="table_name" id="editRoleTableName" class="form-control" required pattern="[a-z0-9_]+">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Go Model Struct Name</label>
+            <input type="text" name="model_name" id="editRoleModelName" class="form-control" required pattern="[A-Za-z0-9_]+">
+          </div>
+        </div>
+
+        <h4 style="margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;"><i class="fa-solid fa-table-columns"></i> Table Fields Schema</h4>
+        <div class="table-responsive">
+          <table class="schema-builder-table">
+            <thead>
+              <tr>
+                <th>Field Name</th>
+                <th>Data Type</th>
+                <th>Length/Values</th>
+                <th>Attributes</th>
+                <th>Relations / Reference Table</th>
+                <th style="width: 50px;"></th>
+              </tr>
+            </thead>
+            <tbody id="editFieldsBody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <button type="button" class="btn btn-secondary btn-sm" onclick="addNewRow('edit')" style="margin-bottom: 2rem;">
+          <i class="fa-solid fa-plus-circle"></i> Add Custom Column
+        </button>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.8rem; background: linear-gradient(135deg, var(--accent-secondary) 0%, #10b981 100%);">
+          <i class="fa-solid fa-check"></i> Save Changes & Migrate Database
+        </button>
+      </form>
+    </div>
+  </div>
+
+{{ template "layouts/app_footer" . }}
+
+  <!-- Scripts -->
+  <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // Calculate field counts from json strings
+      $('.fields-count-cell').each(function() {
+        const jsonStr = $(this).attr('data-fields');
+        if (jsonStr) {
+          try {
+            const arr = JSON.parse(jsonStr);
+            if (Array.isArray(arr)) {
+              $(this).textContent = arr.length;
+              $(this).text(arr.length);
+            }
+          } catch(e){}
+        }
+      });
+
+      const currentLang = localStorage.getItem('lang') || 'id';
+      const langConfig = currentLang === 'en' ? {
+        search: "Search Role:",
+        lengthMenu: "Show _MENU_ entries per page",
+        info: "Showing _START_ to _END_ of _TOTAL_ roles",
+        paginate: {
+          first: "First",
+          last: "Last",
+          next: "Next",
+          previous: "Previous"
+        }
+      } : {
+        search: "Cari Role:",
+        lengthMenu: "Tampilkan _MENU_ data per halaman",
+        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ role",
+        paginate: {
+          first: "Pertama",
+          last: "Terakhir",
+          next: "Selanjutnya",
+          previous: "Sebelumnya"
+        }
+      };
+
+      $('#rolesTable').DataTable({
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        ordering: true,
+        language: langConfig,
+        drawCallback: function() {
+          if (typeof applyAdminTranslations === 'function') {
+            applyAdminTranslations(localStorage.getItem('lang') || 'id');
+          }
+        }
+      });
+    });
+
+    function openCreateModal() {
+      document.getElementById('createFieldsBody').innerHTML = '';
+      addNewRow('create'); // Add default ID row
+      document.getElementById('createRoleModal').style.display = 'flex';
+    }
+    function closeCreateModal() {
+      document.getElementById('createRoleModal').style.display = 'none';
+    }
+
+    function onEditClick(btn) {
+      const id = btn.getAttribute('data-id');
+      const name = btn.getAttribute('data-name');
+      const tableName = btn.getAttribute('data-table');
+      const modelName = btn.getAttribute('data-model');
+      
+      let fields = [];
+      let relations = [];
+      try {
+        fields = JSON.parse(btn.getAttribute('data-fields') || '[]');
+      } catch(e){}
+      try {
+        relations = JSON.parse(btn.getAttribute('data-relations') || '[]');
+      } catch(e){}
+      
+      openEditModal(id, name, tableName, modelName, fields, relations);
+    }
+
+    function openEditModal(id, name, tableName, modelName, fields, relations) {
+      document.getElementById('editRoleForm').action = '/admin/roles/' + id + '/edit';
+      document.getElementById('editRoleName').value = name;
+      document.getElementById('editRoleTableName').value = tableName;
+      document.getElementById('editRoleModelName').value = modelName;
+      
+      const body = document.getElementById('editFieldsBody');
+      body.innerHTML = '';
+      
+      if (fields && fields.length > 0) {
+        fields.forEach(f => {
+          addNewRow('edit', f);
+        });
+      } else {
+        addNewRow('edit');
+      }
+      
+      document.getElementById('editRoleModal').style.display = 'flex';
+    }
+    function closeEditModal() {
+      document.getElementById('editRoleModal').style.display = 'none';
+    }
+
+    let dbTables = [];
+
+    // Fetch database tables on page load and dynamically update active inputs
+    $(document).ready(function() {
+      $.getJSON('/admin/db-tables', function(data) {
+        dbTables = data || [];
+        document.querySelectorAll('.ref-table-select').forEach(select => {
+          const currentValue = select.value;
+          let html = '<option value="">-- Select Table --</option>';
+          dbTables.forEach(t => {
+            html += `<option value="${t}" ${t === currentValue ? 'selected' : ''}>${t}</option>`;
+          });
+          select.innerHTML = html;
+        });
+      });
+    });
+
+    function onRefTableChange(rowId, selectedTable, selectedCol = '') {
+      const colSelect = document.getElementById(rowId + '-ref-field');
+      if (!colSelect) return;
+
+      if (!selectedTable) {
+        colSelect.innerHTML = '<option value="">-- Select Col --</option>';
+        return;
+      }
+
+      $.getJSON('/admin/db-columns/' + selectedTable, function(cols) {
+        let html = '<option value="">-- Select Col --</option>';
+        if (cols && cols.length > 0) {
+          cols.forEach(c => {
+            html += `<option value="${c}" ${c === selectedCol ? 'selected' : ''}>${c}</option>`;
+          });
+        }
+        colSelect.innerHTML = html;
+      }).fail(function() {
+        colSelect.innerHTML = '<option value="">-- Select Col --</option>';
+      });
+    }
+
+    function addNewRow(type, data = null) {
+      const body = document.getElementById(type + 'FieldsBody');
+      const rowId = 'row-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+      
+      const name = data ? data.name : '';
+      const dataType = data ? data.type : 'varchar';
+      const length = data ? data.length : '';
+      const primary = data && data.primary ? 'checked' : '';
+      const nullable = data && data.nullable ? 'checked' : '';
+      const refTable = data && data.relation ? data.relation.table : '';
+      const refField = data && data.relation ? data.relation.field : 'id';
+      
+      // Build options for tables
+      let tableOptions = '<option value="">-- Select Table --</option>';
+      dbTables.forEach(t => {
+        tableOptions += `<option value="${t}" ${t === refTable ? 'selected' : ''}>${t}</option>`;
+      });
+
+      const rowHtml = `
+        <tr id="${rowId}">
+          <td>
+            <input type="text" name="field_names[]" value="${name}" placeholder="e.g. description" class="form-control" required pattern="[a-z0-9_]+">
+          </td>
+          <td>
+            <select name="field_types[]" class="form-control" onchange="onTypeChange('${rowId}', this.value)" style="padding: 0.35rem 0.5rem; min-width: 110px;">
+              <optgroup label="String/Text">
+                <option value="varchar" ${dataType === 'varchar' ? 'selected' : ''}>VARCHAR</option>
+                <option value="char" ${dataType === 'char' ? 'selected' : ''}>CHAR</option>
+                <option value="text" ${dataType === 'text' ? 'selected' : ''}>TEXT</option>
+                <option value="tinytext" ${dataType === 'tinytext' ? 'selected' : ''}>TINYTEXT</option>
+                <option value="mediumtext" ${dataType === 'mediumtext' ? 'selected' : ''}>MEDIUMTEXT</option>
+                <option value="longtext" ${dataType === 'longtext' ? 'selected' : ''}>LONGTEXT</option>
+              </optgroup>
+              <optgroup label="Numeric">
+                <option value="int" ${dataType === 'int' || dataType === 'integer' ? 'selected' : ''}>INT</option>
+                <option value="tinyint" ${dataType === 'tinyint' ? 'selected' : ''}>TINYINT</option>
+                <option value="smallint" ${dataType === 'smallint' ? 'selected' : ''}>SMALLINT</option>
+                <option value="mediumint" ${dataType === 'mediumint' ? 'selected' : ''}>MEDIUMINT</option>
+                <option value="bigint" ${dataType === 'bigint' ? 'selected' : ''}>BIGINT</option>
+                <option value="decimal" ${dataType === 'decimal' ? 'selected' : ''}>DECIMAL</option>
+                <option value="float" ${dataType === 'float' ? 'selected' : ''}>FLOAT</option>
+                <option value="double" ${dataType === 'double' ? 'selected' : ''}>DOUBLE</option>
+                <option value="boolean" ${dataType === 'boolean' ? 'selected' : ''}>BOOLEAN</option>
+              </optgroup>
+              <optgroup label="Date & Time">
+                <option value="date" ${dataType === 'date' ? 'selected' : ''}>DATE</option>
+                <option value="datetime" ${dataType === 'datetime' ? 'selected' : ''}>DATETIME</option>
+                <option value="timestamp" ${dataType === 'timestamp' ? 'selected' : ''}>TIMESTAMP</option>
+                <option value="time" ${dataType === 'time' ? 'selected' : ''}>TIME</option>
+                <option value="year" ${dataType === 'year' ? 'selected' : ''}>YEAR</option>
+              </optgroup>
+              <optgroup label="Binary / Other">
+                <option value="json" ${dataType === 'json' ? 'selected' : ''}>JSON</option>
+                <option value="blob" ${dataType === 'blob' ? 'selected' : ''}>BLOB</option>
+                <option value="longblob" ${dataType === 'longblob' ? 'selected' : ''}>LONGBLOB</option>
+              </optgroup>
+            </select>
+          </td>
+          <td>
+            <input type="text" name="field_lengths[]" value="${length}" placeholder="e.g. 255" class="form-control" id="${rowId}-length">
+          </td>
+          <td style="vertical-align: middle;">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; justify-content: center; align-items: flex-start; padding-left: 0.5rem;">
+              <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; margin: 0; color: var(--text-primary);">
+                <input type="checkbox" name="field_primary[]" value="${rowId}" ${primary} style="width: 15px; height: 15px; cursor: pointer;"> PK
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; margin: 0; color: var(--text-primary);">
+                <input type="checkbox" name="field_nullable[]" value="${rowId}" ${nullable} style="width: 15px; height: 15px; cursor: pointer;"> Null
+              </label>
+            </div>
+          </td>
+          <td style="vertical-align: middle; min-width: 260px;">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 0.75rem; color: var(--text-secondary); min-width: 65px;">Ref Table:</span>
+                <select name="field_ref_tables[]" class="form-control ref-table-select" style="padding: 0.35rem 0.5rem; font-size: 0.85rem;" id="${rowId}-ref-table" onchange="onRefTableChange('${rowId}', this.value)">
+                  ${tableOptions}
+                </select>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 0.75rem; color: var(--text-secondary); min-width: 65px;">Ref Col:</span>
+                <select name="field_ref_fields[]" class="form-control" style="padding: 0.35rem 0.5rem; font-size: 0.85rem;" id="${rowId}-ref-field">
+                  <option value="${refField || ''}">${refField || '-- Select Col --'}</option>
+                </select>
+              </div>
+            </div>
+          </td>
+          <td style="text-align: center; vertical-align: middle;">
+            <button type="button" class="btn btn-danger btn-sm" onclick="removeRow('${rowId}')" style="padding: 0.5rem 0.75rem;">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+      
+      body.insertAdjacentHTML('beforeend', rowHtml);
+      onTypeChange(rowId, dataType);
+
+      // Trigger fetching columns if editing
+      if (refTable) {
+        setTimeout(() => {
+          onRefTableChange(rowId, refTable, refField);
+        }, 150);
+      }
+    }
+
+    function removeRow(rowId) {
+      const row = document.getElementById(rowId);
+      if (row) row.remove();
+    }
+
+    // Toggle disabled attribute for lengths based on types
+    function onTypeChange(rowId, val) {
+      const lengthInput = document.getElementById(rowId + '-length');
+      const noLengthTypes = ['text', 'mediumtext', 'longtext', 'tinytext', 'boolean', 'date', 'datetime', 'timestamp', 'time', 'year', 'json', 'blob', 'longblob'];
+      if (noLengthTypes.includes(val)) {
+        lengthInput.value = '';
+        lengthInput.disabled = true;
+        lengthInput.style.background = 'rgba(255,255,255,0.01)';
+        lengthInput.style.cursor = 'not-allowed';
+      } else {
+        lengthInput.disabled = false;
+        lengthInput.style.background = '';
+        lengthInput.style.cursor = '';
+      }
+    }
+
+    function validateSchemaForm(type) {
+      const parent = document.getElementById(type + 'FieldsBody');
+      const rows = parent.querySelectorAll('tr');
+      if (rows.length === 0) {
+        alert('Please add at least one column/field to the database schema.');
+        return false;
+      }
+
+      // Serialize dynamic fields and relationship constraints
+      const fields = [];
+      const relations = [];
+      let hasError = false;
+
+      rows.forEach(row => {
+        const rowId = row.id;
+        const nameInput = row.querySelector('input[name="field_names[]"]');
+        const typeSelect = row.querySelector('select[name="field_types[]"]');
+        const lengthInput = document.getElementById(rowId + '-length');
+        const primaryCheckbox = row.querySelector('input[name="field_primary[]"]');
+        const nullableCheckbox = row.querySelector('input[name="field_nullable[]"]');
+        const refTableSelect = document.getElementById(rowId + '-ref-table');
+        const refFieldSelect = document.getElementById(rowId + '-ref-field');
+
+        if (!nameInput || !typeSelect) {
+          hasError = true;
+          return;
+        }
+
+        const name = nameInput.value.trim();
+        const dataType = typeSelect.value;
+        const length = lengthInput ? lengthInput.value.trim() : '';
+        const primary = primaryCheckbox ? primaryCheckbox.checked : false;
+        const nullable = nullableCheckbox ? nullableCheckbox.checked : false;
+        const refTable = refTableSelect ? refTableSelect.value : '';
+        const refField = refFieldSelect ? refFieldSelect.value : '';
+
+        const fieldObj = {
+          name: name,
+          type: dataType,
+          length: length,
+          primary: primary,
+          nullable: nullable
+        };
+
+        if (refTable && refField) {
+          fieldObj.relation = {
+            table: refTable,
+            field: refField
+          };
+          relations.push({
+            field: name,
+            table: refTable,
+            ref_field: refField
+          });
+        }
+
+        fields.push(fieldObj);
+      });
+
+      if (hasError) {
+        alert('An error occurred while validating the form. Please check the inputs.');
+        return false;
+      }
+
+      // Inject serialized inputs dynamically into form
+      const form = parent.closest('form');
+      
+      const oldFields = form.querySelector('input[name="fields"]');
+      const oldRelations = form.querySelector('input[name="relations"]');
+      if (oldFields) oldFields.remove();
+      if (oldRelations) oldRelations.remove();
+
+      const fieldsInput = document.createElement('input');
+      fieldsInput.type = 'hidden';
+      fieldsInput.name = 'fields';
+      fieldsInput.value = JSON.stringify(fields);
+      form.appendChild(fieldsInput);
+
+      const relationsInput = document.createElement('input');
+      relationsInput.type = 'hidden';
+      relationsInput.name = 'relations';
+      relationsInput.value = JSON.stringify(relations);
+      form.appendChild(relationsInput);
+
+      return true;
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+      const createModal = document.getElementById('createRoleModal');
+      const editModal = document.getElementById('editRoleModal');
+      if (event.target == createModal) {
+        closeCreateModal();
+      }
+      if (event.target == editModal) {
+        closeEditModal();
+      }
+    }
+  </script>
+{{ end }}

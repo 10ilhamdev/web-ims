@@ -1,0 +1,72 @@
+{{ define "profile/info.tmpl" }}
+{{ template "layouts/app_header" . }}
+      <div style="margin-bottom: 3rem;">
+        <h1 style="font-size: 2rem;" data-translate="profile_title">Data Profil</h1>
+        <p style="color: var(--text-secondary); margin-top: 0.25rem;" data-translate="profile_desc">Kelola data informasi akun pribadi Anda di bawah ini.</p>
+      </div>
+
+      {{ if .Success }}
+        <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #34d399; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; max-width: 650px;">
+          <i class="fa-solid fa-circle-check" style="margin-right: 0.5rem;"></i> {{ .Success }}
+        </div>
+      {{ end }}
+
+      {{ if .Error }}
+        <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #f87171; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; max-width: 650px;">
+          <i class="fa-solid fa-circle-xmark" style="margin-right: 0.5rem;"></i> {{ .Error }}
+        </div>
+      {{ end }}
+
+      <div class="card" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 2.5rem; max-width: 650px; box-shadow: 0 8px 32px rgba(0,0,0,0.25);">
+        <!-- Read-only View -->
+        <div id="profileReadView">
+          <div style="margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 1.25rem;">
+            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 0.5rem;" data-translate="full_name">Nama Lengkap</div>
+            <div style="font-size: 1.1rem; color: var(--text-primary); font-weight: 600;">{{ .User.Name }}</div>
+          </div>
+          <div style="margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 1.25rem;">
+            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 0.5rem;" data-translate="email_address">Alamat Email</div>
+            <div style="font-size: 1.1rem; color: var(--text-primary); font-weight: 600;">{{ .User.Email }}</div>
+          </div>
+          <button class="btn btn-primary" onclick="toggleEditView(true)" style="width: 100%; justify-content: center; padding: 0.85rem;">
+            <i class="fa-solid fa-user-pen" style="margin-right: 0.5rem;"></i> <span data-translate="btn_edit_profile">Edit Data Diri</span>
+          </button>
+        </div>
+
+        <!-- Editable View -->
+        <form id="profileEditForm" action="/profile" method="POST" style="display: none;">
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" data-translate="full_name">Nama Lengkap</label>
+            <input type="text" name="name" class="form-control" value="{{ .User.Name }}" required style="padding: 0.75rem 1rem;">
+          </div>
+          <div class="form-group" style="margin-bottom: 2rem;">
+            <label class="form-label" data-translate="email_address">Alamat Email</label>
+            <input type="email" name="email" class="form-control" value="{{ .User.Email }}" required style="padding: 0.75rem 1rem;">
+          </div>
+          
+          <div style="display: flex; gap: 1rem;">
+            <button type="button" class="btn btn-secondary" onclick="toggleEditView(false)" style="flex: 1; justify-content: center; padding: 0.85rem;">
+              <span data-translate="btn_cancel">Batal</span>
+            </button>
+            <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center; padding: 0.85rem;">
+              <span data-translate="btn_save_changes">Simpan Perubahan</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+  <script>
+    function toggleEditView(isEdit) {
+      const readView = document.getElementById('profileReadView');
+      const editForm = document.getElementById('profileEditForm');
+      if (isEdit) {
+        readView.style.display = 'none';
+        editForm.style.display = 'block';
+      } else {
+        readView.style.display = 'block';
+        editForm.style.display = 'none';
+      }
+    }
+  </script>
+{{ template "layouts/app_footer" . }}
+{{ end }}

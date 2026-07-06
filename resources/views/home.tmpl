@@ -1,5 +1,5 @@
 {{ define "home.tmpl" }}
-{{ template "layouts/header.tmpl" . }}
+{{ template "layouts/guest_header" . }}
 
 <section class="container hero animated" style="position: relative; overflow: visible;">
   <!-- HD Futuristic Dotted Wave Background -->
@@ -11,7 +11,7 @@
     <path d="M-100,160 C300,10 600,410 1000,110 C1200,10 1500,210 1600,60" stroke="#8b5cf6" stroke-width="2"
       stroke-dasharray="2, 16" stroke-linecap="round" opacity="0.15" />
     <path d="M400,650 C700,480 900,750 1100,580 C1200,480 1400,600 1600,500" stroke="var(--accent-secondary)"
-      stroke-width="3" stroke-dasharray="2, 20" stroke-linecap="round" opacity="0.2" />
+      stroke-width="3" stroke-dasharray="zzzzzzzz2, 20" stroke-linecap="round" opacity="0.2" />
     <path d="M400,690 C700,520 900,790 1100,620 C1200,520 1400,640 1600,540" stroke="#8b5cf6" stroke-width="2.5"
       stroke-dasharray="2, 20" stroke-linecap="round" opacity="0.15" />
   </svg>
@@ -75,7 +75,7 @@
 <!-- Technologies / Stack Banner -->
 <section class="container reveal reveal-up" style="margin-top: 8rem; margin-bottom: 7rem; text-align: center;">
   <p style="color: var(--text-muted); font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 1.25rem;"
-    data-translate="stack_banner_text">Teknologi yang Kami Kuasai</p>
+    data-translate="stack_banner_text">Teknologi yang Digunakan</p>
   <div class="tech-slider-container">
     <div class="tech-slider-track">
       <!-- Original Set -->
@@ -95,6 +95,18 @@
           class="fa-brands fa-python"></i></span>
       <span title="Golang" style="font-family: var(--font-mono); font-size: 2.1rem; font-weight: bold;"
         onmouseover="this.style.color='#00add8'" onmouseout="this.style.color=''">Go</span>
+      <span title="Google Cloud" onmouseover="this.style.color='#4285f4'" onmouseout="this.style.color=''"><i
+          class="fa-brands fa-google"></i></span>
+      <span title="Google Drive" onmouseover="this.style.color='#34a853'" onmouseout="this.style.color=''"><i
+          class="fa-brands fa-google-drive"></i></span>
+      <span title="Cloudflare" onmouseover="this.style.color='#f38020'" onmouseout="this.style.color=''"><i
+          class="fa-brands fa-cloudflare"></i></span>
+      <span title="AWS" onmouseover="this.style.color='#ff9900'" onmouseout="this.style.color=''"><i
+          class="fa-brands fa-aws"></i></span>
+      <span title="Docker" onmouseover="this.style.color='#0db7ed'" onmouseout="this.style.color=''"><i
+          class="fa-brands fa-docker"></i></span>
+      <span title="Git" onmouseover="this.style.color='#f05032'" onmouseout="this.style.color=''"><i
+          class="fa-brands fa-git-alt"></i></span>
 
       <!-- Duplicate Set for continuous loop -->
       <span title="Laravel" onmouseover="this.style.color='#ff2d20'" onmouseout="this.style.color=''"><i
@@ -113,6 +125,18 @@
           class="fa-brands fa-python"></i></span>
       <span title="Golang" style="font-family: var(--font-mono); font-size: 2.1rem; font-weight: bold;"
         onmouseover="this.style.color='#00add8'" onmouseout="this.style.color=''">Go</span>
+      <span title="Google Cloud" onmouseover="this.style.color='#4285f4'" onmouseout="this.style.color=''"><i
+          class="fa-brands fa-google"></i></span>
+      <span title="Google Drive" onmouseover="this.style.color='#34a853'" onmouseout="this.style.color=''"><i
+          class="fa-brands fa-google-drive"></i></span>
+      <span title="Cloudflare" onmouseover="this.style.color='#f38020'" onmouseout="this.style.color=''"><i
+          class="fa-brands fa-cloudflare"></i></span>
+      <span title="AWS" onmouseover="this.style.color='#ff9900'" onmouseout="this.style.color=''"><i
+          class="fa-brands fa-aws"></i></span>
+      <span title="Docker" onmouseover="this.style.color='#0db7ed'" onmouseout="this.style.color=''"><i
+          class="fa-brands fa-docker"></i></span>
+      <span title="Git" onmouseover="this.style.color='#f05032'" onmouseout="this.style.color=''"><i
+          class="fa-brands fa-git-alt"></i></span>
     </div>
   </div>
 </section>
@@ -163,5 +187,5 @@
   </div>
 </section>
 
-{{ template "layouts/footer.tmpl" . }}
+{{ template "layouts/guest_footer" . }}
 {{ end }}

@@ -1,0 +1,82 @@
+{{ define "admin/cms_detail.tmpl" }}
+{{ template "layouts/app_header" . }}
+      <!-- Top header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <a href="/admin/cms" style="color: var(--text-secondary); font-size: 1.25rem;"><i class="fa-solid fa-arrow-left-long"></i></a>
+            <h1 style="font-size: 2rem;">Manajemen Konten: {{ .Page.Name }}</h1>
+          </div>
+          <p style="color: var(--text-secondary); margin-top: 0.35rem;">Mengedit isi teks, terjemahan, slogan, dan informasi yang terdaftar pada halaman <strong>{{ .Page.Name }}</strong>.</p>
+        </div>
+        <div style="color: var(--text-secondary); font-size: 0.9rem; text-transform: uppercase; font-family: var(--font-mono);">
+          Type: <span style="color: var(--accent-secondary); font-weight: bold;">{{ .Page.Type }}</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: start;">
+        
+        <!-- Contents Form -->
+        <div class="card" style="border-color: var(--border-color); background: var(--bg-secondary); padding: 2.5rem;">
+          <h3 style="font-size: 1.25rem; margin-bottom: 2rem;"><i class="fa-solid fa-file-invoice" style="margin-right: 0.5rem; color: var(--accent-primary);"></i> Daftar Terjemahan Konten</h3>
+          
+          {{ if .Contents }}
+            <form action="/admin/cms/pages/{{ .Page.ID }}/contents" method="POST">
+              {{ range .Contents }}
+                <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                  <div style="font-weight: 700; color: #fff; font-size: 1rem; margin-bottom: 0.75rem; font-family: var(--font-mono); text-transform: uppercase; display: flex; justify-content: space-between;">
+                    <span>Key: <span style="color: var(--accent-secondary);">{{ .Key }}</span></span>
+                  </div>
+                  
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                      <label class="form-label" style="font-size: 0.8rem; color: var(--text-secondary);">Bahasa Indonesia (ID)</label>
+                      <textarea name="{{ .Key }}_id" class="form-control" rows="2" required>{{ .ValueId }}</textarea>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" style="font-size: 0.8rem; color: var(--text-secondary);">English (EN)</label>
+                      <textarea name="{{ .Key }}_en" class="form-control" rows="2" required>{{ .ValueEn }}</textarea>
+                    </div>
+                  </div>
+                </div>
+              {{ end }}
+              
+              <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 1rem;">
+                <i class="fa-solid fa-save"></i> Simpan Semua Konten Halaman
+              </button>
+            </form>
+          {{ else }}
+            <div style="padding: 3rem; text-align: center; color: var(--text-secondary);">
+              <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+              <p>Belum ada isi konten terdaftar untuk halaman ini.</p>
+            </div>
+          {{ end }}
+        </div>
+
+        <!-- Add Content Key Sidebar Card -->
+        <div class="card" style="border-color: var(--border-color); background: var(--bg-secondary); padding: 2rem;">
+          <h3 style="font-size: 1.2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-plus-circle" style="margin-right: 0.5rem; color: var(--accent-primary);"></i> Tambah Key Baru</h3>
+          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">Tambahkan kunci terjemahan baru yang akan dimuat dinamis pada halaman guest.</p>
+          
+          <form action="/admin/cms/pages/{{ .Page.ID }}/contents/create" method="POST">
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label class="form-label" style="font-size: 0.8rem;">Kunci Konten (Key)</label>
+              <input type="text" name="key" class="form-control" placeholder="e.g. hero_new_title" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label class="form-label" style="font-size: 0.8rem;">Konten ID (Indonesian)</label>
+              <textarea name="value_id" class="form-control" rows="2" placeholder="Teks Terjemahan Indonesia" required></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+              <label class="form-label" style="font-size: 0.8rem;">Konten EN (English)</label>
+              <textarea name="value_en" class="form-control" rows="2" placeholder="Teks Terjemahan Inggris" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+              <i class="fa-solid fa-plus"></i> Tambah Key
+            </button>
+          </form>
+        </div>
+
+      </div>
+{{ template "layouts/app_footer" . }}
+{{ end }}

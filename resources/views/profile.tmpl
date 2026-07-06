@@ -1,0 +1,115 @@
+{{ define "profile.tmpl" }}
+{{ template "layouts/guest_header" . }}
+
+<section class="container" style="padding-top: 4rem; padding-bottom: 6rem;">
+  <div style="margin-bottom: 3rem;">
+    <h2 style="font-size: 2.25rem; font-family: var(--font-mono); margin-bottom: 0.5rem; text-align: center;">Pengaturan Akun & Profil</h2>
+    <p style="color: var(--text-secondary); text-align: center; max-width: 600px; margin: 0 auto;">Kelola informasi profil Anda, ubah kata sandi, dan pantau riwayat log aktivitas perangkat Anda.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; margin-bottom: 4rem;">
+    
+    <!-- Profil Card -->
+    <div class="card animated" style="background: var(--bg-secondary); border-color: var(--border-color); padding: 2.5rem;">
+      <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="fa-solid fa-user" style="color: var(--accent-primary);"></i> Edit Data Diri
+      </h3>
+      <form action="/profile" method="POST">
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label class="form-label">Nama Lengkap</label>
+          <input type="text" name="name" class="form-control" value="{{ .User.Name }}" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 2rem;">
+          <label class="form-label">Alamat Email</label>
+          <input type="email" name="email" class="form-control" value="{{ .User.Email }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+          <i class="fa-solid fa-save"></i> Simpan Perubahan
+        </button>
+      </form>
+    </div>
+
+    <!-- Password Card -->
+    <div class="card animated" style="background: var(--bg-secondary); border-color: var(--border-color); padding: 2.5rem;">
+      <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="fa-solid fa-key" style="color: var(--accent-secondary);"></i> Ubah Kata Sandi
+      </h3>
+      <form action="/profile/password" method="POST">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label class="form-label">Kata Sandi Saat Ini</label>
+          <input type="password" name="current_password" class="form-control" required placeholder="Masukkan kata sandi lama">
+        </div>
+        <div class="form-group" style="margin-bottom: 2rem;">
+          <label class="form-label">Kata Sandi Baru</label>
+          <input type="password" name="new_password" class="form-control" required placeholder="Masukkan kata sandi baru">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; background: linear-gradient(135deg, var(--accent-secondary) 0%, #10b981 100%);">
+          <i class="fa-solid fa-check"></i> Perbarui Kata Sandi
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- Activity & Login History -->
+  <div class="card animated" style="background: var(--bg-secondary); border-color: var(--border-color); padding: 2.5rem;">
+    <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+      <i class="fa-solid fa-shield-halved" style="color: #10b981;"></i> Riwayat Aktivitas & Perangkat
+    </h3>
+    <div class="table-responsive">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border-color);">
+            <th style="padding: 1rem; text-align: left; color: var(--text-secondary);">Waktu Aktivitas</th>
+            <th style="padding: 1rem; text-align: left; color: var(--text-secondary);">Aktivitas</th>
+            <th style="padding: 1rem; text-align: left; color: var(--text-secondary);">Perangkat</th>
+            <th style="padding: 1rem; text-align: left; color: var(--text-secondary);">Alamat IP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ range .Logs }}
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td class="date-format" data-date="{{ .CreatedAt }}" style="padding: 1rem;">{{ .CreatedAt }}</td>
+            <td style="padding: 1rem; font-weight: 600; color: #fff;">{{ .Activity }}</td>
+            <td style="padding: 1rem;">
+              {{ if eq .Device "Mobile" }}
+                <i class="fa-solid fa-mobile-screen-button" style="margin-right: 0.5rem; color: var(--accent-secondary);"></i> Mobile
+              {{ else if eq .Device "Tablet" }}
+                <i class="fa-solid fa-tablet-screen-button" style="margin-right: 0.5rem; color: var(--info);"></i> Tablet
+              {{ else }}
+                <i class="fa-solid fa-desktop" style="margin-right: 0.5rem; color: var(--accent-primary);"></i> Desktop
+              {{ end }}
+            </td>
+            <td style="padding: 1rem; font-family: var(--font-mono); font-size: 0.85rem;">{{ .IP }}</td>
+          </tr>
+          {{ else }}
+          <tr>
+            <td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-secondary);">Belum ada riwayat aktivitas tercatat.</td>
+          </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Format dates
+    document.querySelectorAll('.date-format').forEach(el => {
+      const dateStr = el.getAttribute('data-date');
+      if (dateStr) {
+        try {
+          const d = new Date(dateStr);
+          el.textContent = d.toLocaleDateString('id-ID', { 
+            year: 'numeric', month: 'short', day: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit' 
+          });
+        } catch (e) {}
+      }
+    });
+  });
+</script>
+
+{{ template "layouts/guest_footer" . }}
+{{ end }}

@@ -1,0 +1,443 @@
+{{ define "layouts/guest_header" }}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IMS - Turning Ideas Into Digital Solutions</title>
+  <link rel="stylesheet" href="/public/css/style.css?v=100">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    // Initialize Theme immediately to prevent flash
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+      document.documentElement.classList.add('light-theme');
+    }
+
+    // Dynamic Navigation Active Link Highlight
+    document.addEventListener("DOMContentLoaded", () => {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll(".nav-links .nav-link");
+      navLinks.forEach(link => {
+        const href = link.getAttribute("href");
+        if (href === currentPath) {
+          link.classList.add("active");
+        } else if (currentPath.startsWith(href) && href !== "/") {
+          link.classList.add("active");
+        }
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <!-- Futuristic Dynamic Dot Matrix Wave Background -->
+  <div class="futuristic-dot-grid"></div>
+
+  <!-- Futuristic Glowing Particles Background -->
+  <div class="futuristic-bubble-1"></div>
+  <div class="futuristic-bubble-2"></div>
+  <div class="futuristic-bubble-3"></div>
+  <div class="futuristic-bubble-4"></div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="/" class="logo">
+      <img src="/public/img/logo_ims.png" alt="IMS Logo" onerror="this.style.display='none';">
+      <span>IMS</span>
+    </a>
+
+    <nav class="nav-links">
+      <a href="/" class="nav-link" data-translate="nav_home">Home</a>
+      <a href="/services" class="nav-link" data-translate="nav_services">Services</a>
+      <a href="/products" class="nav-link" data-translate="nav_products">Products</a>
+
+      {{ if .User }}
+        {{ if eq .User.Role "admin" }}
+          <a href="/admin" class="nav-link"><i class="fa-solid fa-gauge"></i> <span data-translate="nav_admin">Admin Panel</span></a>
+        {{ else }}
+          <a href="/orders" class="nav-link"><i class="fa-solid fa-list"></i> <span data-translate="nav_my_orders">My Orders</span></a>
+        {{ end }}
+
+        <span style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500;" data-translate="hi_user"
+          data-username="{{ .User.Name }}">Hi, {{ .User.Name }}</span>
+        <a href="/logout" class="btn btn-secondary btn-sm"><i class="fa-solid fa-sign-out"></i> <span data-translate="nav_logout">Logout</span></a>
+      {{ else }}
+        <a href="/login" class="btn btn-primary btn-sm" data-translate="nav_login">Login</a>
+      {{ end }}
+    </nav>
+
+    <!-- Interface Controls -->
+    <div class="interface-controls">
+      <button class="btn-icon" id="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+        <i class="fa-solid fa-sun" style="display:none;" id="sun-icon"></i>
+        <i class="fa-solid fa-moon" id="moon-icon"></i>
+      </button>
+      <select class="select-lang" id="lang-select" onchange="changeLanguage(this.value)" title="Change Language">
+        <option value="id">ID</option>
+        <option value="en">EN</option>
+      </select>
+    </div>
+  </header>
+
+  <main class="main-content">
+{{ end }}
+
+{{ define "layouts/guest_footer" }}
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="logo">
+          <img src="/public/img/logo_ims.png" alt="IMS Logo" style="height: 2.25rem; width: auto;">
+          <span>Innovation Massive Solutions</span>
+        </div>
+        <p class="footer-desc" data-translate="footer_desc">
+          Innovation Massive Solutions (IMS) menyediakan layanan pengembangan website profesional dengan beragam teknologi modern. 
+          Kami menghadirkan solusi inovatif, aman, skalabel, dan ramah pengguna untuk mendukung transformasi bisnis klien.
+        </p>
+      </div>
+      <div>
+        <h3 class="footer-title" data-translate="footer_nav_title">Navigasi</h3>
+        <ul class="footer-links">
+          <li><a href="/" data-translate="nav_home">Beranda</a></li>
+          <li><a href="/services" data-translate="nav_services">Layanan</a></li>
+          <li><a href="/products" data-translate="nav_products">Produk</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="footer-title" data-translate="footer_contact_title">Hubungi Kami</h3>
+        <ul class="footer-links" style="color: var(--text-secondary); font-size: 0.95rem;">
+          <li style="margin-bottom: 0.75rem;"><i class="fa-solid fa-envelope" style="color: var(--accent-primary); margin-right: 0.5rem;"></i> contact@ims.com</li>
+          <li style="margin-bottom: 0.75rem;"><i class="fa-solid fa-phone" style="color: var(--accent-primary); margin-right: 0.5rem;"></i> +62 812-3456-7890</li>
+          <li style="margin-bottom: 0.75rem;"><i class="fa-solid fa-location-dot" style="color: var(--accent-primary); margin-right: 0.5rem;"></i> Bandung, Indonesia</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p data-translate="footer_copy">&copy; 2026 Innovation Massive Solutions (IMS). Hak Cipta Dilindungi Undang-Undang.</p>
+    </div>
+  </footer>
+
+  {{ if .CmsTranslationsIDJson }}
+  <script id="cms-translations-id" type="application/json">{{ .CmsTranslationsIDJson }}</script>
+  {{ end }}
+  {{ if .CmsTranslationsENJson }}
+  <script id="cms-translations-en" type="application/json">{{ .CmsTranslationsENJson }}</script>
+  {{ end }}
+
+  <!-- Translation & Theme Engine Scripts -->
+  <script>
+    const translations = {
+      id: {
+        nav_home: "Beranda",
+        nav_services: "Layanan",
+        nav_products: "Produk",
+        nav_login: "Masuk",
+        nav_register: "Daftar",
+        nav_admin: "Panel Admin",
+        nav_my_orders: "Pesanan Saya",
+        nav_logout: "Keluar",
+        hi_user: "Halo, ",
+        footer_desc: "Innovation Massive Solutions (IMS) menyediakan layanan pengembangan website profesional dengan beragam teknologi modern. Kami menghadirkan solusi inovatif, aman, skalabel, dan ramah pengguna untuk mendukung transformasi bisnis klien.",
+        footer_nav_title: "Navigasi",
+        footer_contact_title: "Hubungi Kami",
+        footer_copy: "© 2026 Innovation Massive Solutions (IMS). Hak Cipta Dilindungi Undang-Undang.",
+        
+        // Auth translation
+        login_title: "Masuk",
+        login_desc: "Akses akun & dashboard IMS Anda",
+        email_label: "Alamat Email",
+        password_label: "Kata Sandi",
+        btn_login: "Masuk",
+        no_account: "Belum punya akun?",
+        register_here: "Daftar di sini",
+        register_title: "Daftar Akun",
+        register_desc: "Mulai perjalanan transformasi digital Anda bersama IMS",
+        name_label: "Nama Lengkap",
+        btn_register: "Daftar",
+        already_account: "Sudah punya akun?",
+        signin_here: "Masuk di sini",
+        
+        // Home page translation
+        hero_slogan: "Mengubah Ide Menjadi Solusi Digital",
+        hero_title_1: "Tingkatkan Bisnis Anda Dengan",
+        hero_title_2: "Pengembangan Website Premium",
+        hero_desc: "IMS (Innovation Massive Solutions) merancang dan membangun aplikasi web berkinerja tinggi yang disesuaikan untuk bisnis Anda. Aman, responsif, dan dibuat menggunakan teknologi modern seperti Laravel, React, Vue, Go, dan Node.js.",
+        btn_view_packages: "Lihat Paket Kami",
+        btn_explore_services: "Jelajahi Layanan",
+        stack_banner_text: "Teknologi yang Digunakan",
+        why_partner_title: "Mengapa Bermitra dengan IMS?",
+        why_partner_desc: "Kami membangun sistem web yang unggul dalam kinerja, keamanan, dan pengalaman pengguna.",
+        feature_clean_code: "Kode Bersih Modern",
+        feature_clean_code_desc: "Memanfaatkan arsitektur perangkat lunak yang kuat dengan React, Node.js, dan Golang untuk memastikan pemeliharaan basis kode yang mudah.",
+        feature_security: "Keamanan Skala Enterprise",
+        feature_security_desc: "Kami menerapkan enkripsi tingkat tinggi, pemeriksaan keamanan digital, dan mekanisme otentikasi yang aman di setiap proyek.",
+        feature_performance: "Performa Tinggi",
+        feature_performance_desc: "Pemuatan halaman yang sangat cepat dengan optimasi sisi server, cache konten, dan sistem desain yang responsif.",
+        cta_ready_title: "Siap Meluncurkan Usaha Digital Anda?",
+        cta_ready_desc: "Pilih dari paket web yang sudah kami siapkan atau ajukan cetak biru portal kustom yang dirancang sesuai kebutuhan Anda.",
+        cta_btn_get_started: "Mulai Sekarang",
+        
+        // Services Page
+        services_slogan: "Keahlian Kami",
+        services_title: "Layanan & Teknologi Komprehensif",
+        services_desc: "Kami memanfaatkan kerangka kerja terbaik dan infrastruktur cloud untuk membuat solusi tangguh bagi pertumbuhan bisnis.",
+        service_laravel_title: "Pengembangan Laravel",
+        service_laravel_desc: "Membangun aplikasi perusahaan berbasis database dan modular. Sangat cocok untuk portal, panel administrasi, dan API backend yang tangguh.",
+        service_react_title: "React & SPA Platforms",
+        service_react_desc: "Dasbor klien berkinerja tinggi, antarmuka dinamis, dan aplikasi satu halaman (SPA) menggunakan Next.js dan manajemen status kustom.",
+        service_vue_title: "Aplikasi Vue.js & Nuxt.js",
+        service_vue_desc: "Pengalaman pengguna yang interaktif dengan frontend reaktif. Pembuatan prototipe cepat dan layanan integrasi web yang mulus.",
+        service_node_title: "Arsitektur Server Node.js",
+        service_node_desc: "API RESTful & GraphQL yang skalabel, server komunikasi real-time (WebSockets), dan konfigurasi layanan mikro.",
+        service_python_title: "Otomatisasi Python & AI",
+        service_python_desc: "Saluran pemrosesan data, integrasi pembelajaran mesin, analitik kegerdasan bisnis, dan sistem otomatisasi latar belakang.",
+        service_wordpress_title: "Portal Premium WordPress",
+        service_wordpress_desc: "Halaman arahan kustom, situs web perusahaan premium, blog, dan sistem konten dengan penyesuaian kecepatan dan keamanan optimal.",
+        service_cloud_title: "Infrastruktur Cloud",
+        service_cloud_desc: "Orkestrasi Docker, penyebaran AWS/GCP, alur integrasi dan pengiriman berkelanjutan (CI/CD), dan pemantauan server.",
+        service_security_title: "Keamanan & Kriptografi",
+        service_security_desc: "Enkripsi ujung-ke-ujung, logika tanda tangan digital, audit basis data yang aman, dan penilaian kepatuhan keamanan.",
+        service_golang_title: "Pengembangan Backend Golang",
+        service_golang_desc: "Membangun microservices berkinerja tinggi, API gRPC/REST, dan pemrosesan paralel cepat dengan keamanan memori optimal.",
+        service_integration_title: "Integrasi Layanan Google & CDN",
+        service_integration_desc: "Penyimpanan cloud Google Drive, pelacakan trafik dengan Google Analytics, dan optimasi kecepatan dengan CDN Cloudflare.",
+        service_charting_title: "Visualisasi Data & Grafik",
+        service_charting_desc: "Pembuatan dashboard analitik interaktif menggunakan CDN pustaka grafik (Chart.js, ApexCharts) untuk pie chart, bar chart, dan line chart.",
+        service_vr_title: "Ruangan Virtual & 3D WebGL",
+        service_vr_desc: "Membangun tur virtual 3D, showroom interaktif, dan ruang virtual imersif berbasis Three.js, A-Frame, dan WebGL.",
+        service_flipbook_title: "Flipbook & Media Interaktif",
+        service_flipbook_desc: "Konversi PDF ke flipbook interaktif 3D (Turn.js, dFlip) dengan efek balik halaman realistis untuk katalog, brosur, dan majalah digital.",
+        service_realtime_title: "Komunikasi Real-Time & WebRTC",
+        service_realtime_desc: "Mengintegrasikan WebRTC and WebSockets untuk konferensi video peer-to-peer, chat real-time, kolaborasi multi-pengguna, dan live streaming.",
+        service_pwa_title: "Progressive Web App (PWA)",
+        service_pwa_desc: "Menciptakan aplikasi web yang dapat diinstal langsung di perangkat user, berjalan secara offline (Service Workers), dan mendukung push notifications.",
+        service_wasm_title: "High-Performance WebAssembly (Wasm)",
+        service_wasm_desc: "Kompilasi kode C++/Rust ke Wasm untuk memproses data berat langsung di browser, seperti editor video/gambar dan game web.",
+        services_custom_title: "Punya Proyek Kustom?",
+        services_custom_desc: "Jika kebutuhan Anda di luar paket konfigurasi kami, kami dapat menyusun cetak biru kustom yang dirancang sesuai arsitektur target Anda.",
+        services_custom_btn: "Hubungi Arsitek Kami",
+
+        // Products Page
+        products_slogan: "Paket & Harga",
+        products_title: "Pilih Paket Pengembangan Anda",
+        products_desc: "Harga jujur dan transparan. Pilih paket yang sesuai dengan skala bisnis Anda saat ini, dan kami akan membangunnya dengan sempurna.",
+        products_whats_included: "Yang Termasuk",
+        products_btn_order: "Pesan Sekarang",
+        products_btn_discuss: "Hubungi Kami",
+        product_price_negotiable: "Hubungi Kami",
+
+        // Product Details
+        product_name_1: "Paket Web Standar",
+        product_name_2: "Paket Bisnis Premium",
+        product_name_3: "Cetak Biru Portal & Solusi Enterprise Kustom",
+        product_desc_1: "Sempurna untuk profil bisnis kecil, portofolio, dan landing page.",
+        product_desc_2: "Website profesional dengan CMS admin panel khusus, blog, dan fungsionalitas dinamis.",
+        product_desc_3: "Platform kustom berskala besar, integrasi API, orkestrasi cloud, dan solusi enterprise yang disesuaikan."
+      },
+      en: {
+        nav_home: "Home",
+        nav_services: "Services",
+        nav_products: "Products",
+        nav_login: "Login",
+        nav_register: "Register",
+        nav_admin: "Admin Panel",
+        nav_my_orders: "My Orders",
+        nav_logout: "Logout",
+        hi_user: "Hi, ",
+        footer_desc: "Innovation Massive Solutions (IMS) provides professional website development using cutting-edge technologies. We deliver secure, scalable, and responsive digital solutions to support your business transformation.",
+        footer_nav_title: "Navigation",
+        footer_contact_title: "Contact Us",
+        footer_copy: "© 2026 Innovation Massive Solutions (IMS). All rights reserved.",
+        
+        // Auth translation
+        login_title: "Sign In",
+        login_desc: "Access your IMS account & dashboard",
+        email_label: "Email Address",
+        password_label: "Password",
+        btn_login: "Login",
+        no_account: "Don't have an account?",
+        register_here: "Register here",
+        register_title: "Create Account",
+        register_desc: "Start your digital transformation journey with IMS",
+        name_label: "Full Name",
+        btn_register: "Register",
+        already_account: "Already have an account?",
+        signin_here: "Sign In here",
+        
+        // Home page translation
+        hero_slogan: "Turning Ideas Into Digital Solutions",
+        hero_title_1: "Grow Your Business With",
+        hero_title_2: "Premium Website Development",
+        hero_desc: "IMS (Innovation Massive Solutions) designs and builds high-performance web applications tailored to your business. Secure, responsive, and crafted using modern tech like Laravel, React, Vue, Go, and Node.js.",
+        btn_view_packages: "View Our Packages",
+        btn_explore_services: "Explore Services",
+        stack_banner_text: "Technologies We Leverage",
+        why_partner_title: "Why Partner With IMS?",
+        why_partner_desc: "We engineer web systems that excel in speed, protection, and user experience.",
+        feature_clean_code: "Modern Clean Code",
+        feature_clean_code_desc: "Leveraging robust software architectures with React, Node.js, and Golang to ensure easy codebase maintenance.",
+        feature_security: "Enterprise-Grade Security",
+        feature_security_desc: "We deploy state-of-the-art encryption, digital signature logic, and secure authentication schemas on every single project.",
+        feature_performance: "Blazing Fast Performance",
+        feature_performance_desc: "Hyper-optimized page speed through advanced caching, light assets, and responsive custom layout architectures.",
+        cta_ready_title: "Ready to Unleash Your Digital Product?",
+        cta_ready_desc: "Select a prepared configuration or request a customized blueprint matching your requirements.",
+        cta_btn_get_started: "Get Started Now",
+        
+        // Services Page
+        services_slogan: "Our Expertise",
+        services_title: "Comprehensive Services & Tech Stack",
+        services_desc: "We harness industry-best frameworks and cloud infrastructure to create resilient solutions for business growth.",
+        service_laravel_title: "Laravel Engineering",
+        service_laravel_desc: "Building modular, database-driven business applications. Perfect for portals, administrative panels, and robust backend APIs.",
+        service_react_title: "React & SPA Platforms",
+        service_react_desc: "High-performance client dashboards, dynamic interfaces, and single-page apps (SPA) utilizing Next.js and custom state management.",
+        service_vue_title: "Vue.js & Nuxt.js Apps",
+        service_vue_desc: "Interactive user experiences with reactive frontends. Rapid prototyping and smooth web integration services.",
+        service_node_title: "Node.js Server Architecture",
+        service_node_desc: "Scalable RESTful & GraphQL APIs, real-time communication servers (WebSockets), and microservices configuration.",
+        service_python_title: "Python Automation & AI",
+        service_python_desc: "Data processing pipelines, machine learning integration, business intelligence analytics, and background automation systems.",
+        service_wordpress_title: "WordPress Premium Portals",
+        service_wordpress_desc: "Custom landing pages, premium corporate websites, blogs, and content systems with optimal speed and security tuning.",
+        service_cloud_title: "Cloud Infrastructure",
+        service_cloud_desc: "Docker orchestration, AWS/GCP deployment, continuous integration and delivery (CI/CD) pipelines, and server monitoring.",
+        service_security_title: "Security & Cryptography",
+        service_security_desc: "End-to-end encryption, digital signature logic, secure database audits, and security compliance assessments.",
+        service_golang_title: "Golang Backend Development",
+        service_golang_desc: "Building high-performance microservices, fast gRPC/REST APIs, and concurrent processing pipelines with memory-safety.",
+        service_integration_title: "Google Integrations & CDN",
+        service_integration_desc: "Google Drive cloud storage integration, traffic tracking with Google Analytics, and edge performance optimization via Cloudflare CDN.",
+        service_charting_title: "Data Visualization & Charts",
+        service_charting_desc: "Creating interactive analytic dashboards using graphing libraries (Chart.js, ApexCharts) for pie charts, bar charts, and line charts.",
+        service_vr_title: "Virtual Rooms & 3D WebGL",
+        service_vr_desc: "Building immersive 3D virtual tours, interactive showrooms, and visual spaces powered by Three.js, A-Frame, and WebGL.",
+        service_flipbook_title: "Flipbook & Interactive Media",
+        service_flipbook_desc: "Converting PDFs into 3D interactive flipbooks (Turn.js, dFlip) with realistic page-flip effects for catalogs, brochures, and digital magazines.",
+        service_realtime_title: "Real-Time Comms & WebRTC",
+        service_realtime_desc: "Integrating WebRTC and WebSockets for peer-to-peer video conferencing, live chat systems, multi-user collaboration, and broadcasting.",
+        service_pwa_title: "Progressive Web Apps (PWA)",
+        service_pwa_desc: "Designing web applications installable directly on devices, running offline (Service Workers), and supporting push alerts.",
+        service_wasm_title: "High-Performance WebAssembly (Wasm)",
+        service_wasm_desc: "Compiling C++/Rust to Wasm for heavy CPU processing inside the browser, like video/image editing and web-based games.",
+        services_custom_title: "Need a Custom Project?",
+        services_custom_desc: "If your requirements are beyond our pre-packaged configurations, we can draft a custom blueprint tailored to your target architecture.",
+        services_custom_btn: "Contact Our Architect",
+
+        // Products Page
+        products_slogan: "Packages & Pricing",
+        products_title: "Choose Your Development Package",
+        products_desc: "Honest, transparent pricing. Pick a plan fitting your current business scale, and we will build it to perfection.",
+        products_whats_included: "What's Included",
+        products_btn_order: "Order Now",
+        products_btn_discuss: "Get In Touch",
+        product_price_negotiable: "Contact Us",
+
+        // Product Details
+        product_name_1: "Standard Web Package",
+        product_name_2: "Premium Business Package",
+        product_name_3: "Corporate Portal Blueprint & Custom Enterprise Solution",
+        product_desc_1: "Perfect for small business profiles, portfolios, and landing pages.",
+        product_desc_2: "Professional website with dedicated CMS admin panel, blog, and dynamic features.",
+        product_desc_3: "Large-scale custom platform, API integrations, cloud orchestration, and tailored enterprise solutions."
+      }
+    };
+
+    // Merge database translations if they exist
+    const idEl = document.getElementById('cms-translations-id');
+    const enEl = document.getElementById('cms-translations-en');
+    if (idEl && idEl.textContent) {
+      try {
+        const dbTranslationsID = JSON.parse(idEl.textContent);
+        Object.assign(translations.id, dbTranslationsID);
+      } catch(e){}
+    }
+    if (enEl && enEl.textContent) {
+      try {
+        const dbTranslationsEN = JSON.parse(enEl.textContent);
+        Object.assign(translations.en, dbTranslationsEN);
+      } catch(e){}
+    }
+
+    // Dark/Light Theme Switching
+    const themeToggle = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+
+    function toggleTheme() {
+      const isLight = document.documentElement.classList.toggle('light-theme');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      updateThemeIcons();
+    }
+
+    function updateThemeIcons() {
+      const isLight = document.documentElement.classList.contains('light-theme');
+      if (sunIcon && moonIcon) {
+        if (isLight) {
+          sunIcon.style.display = 'block';
+          moonIcon.style.display = 'none';
+        } else {
+          sunIcon.style.display = 'none';
+          moonIcon.style.display = 'block';
+        }
+      }
+    }
+
+    // Language Switching
+    const langSelect = document.getElementById('lang-select');
+    
+    function changeLanguage(lang) {
+      localStorage.setItem('lang', lang);
+      applyTranslations(lang);
+      if (langSelect) langSelect.value = lang;
+    }
+
+    function applyTranslations(lang) {
+      const dict = translations[lang] || translations['id'];
+      document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        if (dict[key]) {
+          if (key === 'hi_user') {
+            const username = el.getAttribute('data-username') || '';
+            el.innerHTML = '<i class="fa-solid fa-user"></i> ' + dict[key] + username;
+          } else {
+            el.textContent = dict[key];
+          }
+        }
+      });
+    }
+
+    // Boot theme & translation logic
+    document.addEventListener("DOMContentLoaded", () => {
+      // Sync Theme state
+      updateThemeIcons();
+
+      // Sync Lang state
+      const savedLang = localStorage.getItem('lang') || 'id';
+      changeLanguage(savedLang);
+
+      // Scroll Reveal Observer
+      const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          } else {
+            entry.target.classList.remove('active');
+          }
+        });
+      }, { threshold: 0.05 });
+
+      document.querySelectorAll('.reveal').forEach(el => {
+        scrollObserver.observe(el);
+      });
+    });
+  </script>
+</body>
+
+</html>
+{{ end }}

@@ -1,64 +1,10 @@
 {{ define "admin/dashboard.tmpl" }}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard | IMS Control Panel</title>
-  <link rel="stylesheet" href="/public/css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body style="background-image: none; background-color: var(--bg-primary);">
-
-  <div class="admin-layout">
-    
-    <!-- Sidebar -->
-    <aside class="admin-sidebar">
-      <div class="logo">
-        <div class="logo-icon">I</div>
-        <span>IMS Admin</span>
-      </div>
-      
-      <div class="sidebar-user">
-        <div class="sidebar-avatar">
-          {{ if .User }}
-            {{ printf "%.1s" .User.Name }}
-          {{ else }}
-            A
-          {{ end }}
-        </div>
-        <div>
-          <div style="font-weight: 600; font-size: 0.95rem;">{{ .User.Name }}</div>
-          <div style="color: var(--accent-secondary); font-size: 0.8rem; font-weight: 500; text-transform: uppercase;">Administrator</div>
-        </div>
-      </div>
-      
-      <ul class="sidebar-menu">
-        <li class="active">
-          <a href="/admin"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-        </li>
-        <li>
-          <a href="/"><i class="fa-solid fa-globe"></i> Main Website</a>
-        </li>
-        <li>
-          <a href="/products"><i class="fa-solid fa-list-check"></i> Pricing Packages</a>
-        </li>
-        <li style="margin-top: 4rem;">
-          <a href="/logout" class="btn btn-danger btn-sm" style="color: #fff; justify-content: center; gap: 0.5rem;">
-            <i class="fa-solid fa-sign-out"></i> Logout
-          </a>
-        </li>
-      </ul>
-    </aside>
-
-    <!-- Main Admin Content -->
-    <main class="admin-content">
-      
+{{ template "layouts/app_header" . }}
       <!-- Top header -->
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
         <div>
-          <h1 style="font-size: 2rem;">Overview & Management</h1>
-          <p style="color: var(--text-secondary); margin-top: 0.25rem;">Welcome back, administrator. Manage sales operations here.</p>
+          <h1 style="font-size: 2rem;" data-translate="dash_title">Overview & Management</h1>
+          <p style="color: var(--text-secondary); margin-top: 0.25rem;" data-translate="dash_desc">Welcome back, administrator. Manage sales operations here.</p>
         </div>
         <div style="color: var(--text-secondary); font-size: 0.9rem;">
           <i class="fa-solid fa-calendar" style="color: var(--accent-primary); margin-right: 0.5rem;"></i> IMS Operations System
@@ -69,7 +15,7 @@
       <div class="stats-grid">
         <div class="stat-card">
           <div>
-            <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; font-weight: 600;">Total Orders</div>
+            <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; font-weight: 600;" data-translate="dash_total_orders">Total Orders</div>
             <div class="stat-val">{{ .TotalOrders }}</div>
           </div>
           <div class="stat-icon"><i class="fa-solid fa-box"></i></div>
@@ -77,7 +23,7 @@
 
         <div class="stat-card">
           <div>
-            <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; font-weight: 600;">Active Projects</div>
+            <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; font-weight: 600;" data-translate="dash_active_projects">Active Projects</div>
             <div class="stat-val">{{ .ActiveOrders }}</div>
           </div>
           <div class="stat-icon" style="color: var(--info);"><i class="fa-solid fa-spinner"></i></div>
@@ -85,7 +31,7 @@
 
         <div class="stat-card">
           <div>
-            <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; font-weight: 600;">Total Revenue</div>
+            <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; font-weight: 600;" data-translate="dash_total_revenue">Total Revenue</div>
             <div class="stat-val" style="font-size: 1.5rem; margin-top: 0.8rem; color: var(--success);">
               Rp <span class="price-format" data-price="{{ .TotalRevenue }}">{{ .TotalRevenue }}</span>
             </div>
@@ -95,7 +41,7 @@
 
         <div class="stat-card">
           <div>
-            <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; font-weight: 600;">Registered Clients</div>
+            <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; font-weight: 600;" data-translate="dash_registered_clients">Registered Clients</div>
             <div class="stat-val">{{ .TotalClients }}</div>
           </div>
           <div class="stat-icon" style="color: var(--accent-secondary);"><i class="fa-solid fa-users"></i></div>
@@ -104,19 +50,19 @@
 
       <!-- Orders Panel -->
       <div class="card" style="border-color: var(--border-color); background: var(--bg-secondary);">
-        <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-list" style="margin-right: 0.5rem; color: var(--accent-primary);"></i> Client Orders List</h3>
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-list" style="margin-right: 0.5rem; color: var(--accent-primary);"></i> <span data-translate="dash_orders_list">Client Orders List</span></h3>
         
         <div class="table-responsive">
           <table>
             <thead>
               <tr>
-                <th>Order ID</th>
-                <th>Client Name</th>
-                <th>Package Name</th>
-                <th>Price</th>
-                <th>Status</th>
-                <th>Update Status</th>
-                <th>Placed Date</th>
+                <th data-translate="col_order_id">Order ID</th>
+                <th data-translate="col_client_name">Client Name</th>
+                <th data-translate="col_package_name">Package Name</th>
+                <th data-translate="col_price">Price</th>
+                <th data-translate="col_status">Status</th>
+                <th data-translate="col_update_status">Update Status</th>
+                <th data-translate="col_placed_date">Placed Date</th>
               </tr>
             </thead>
             <tbody>
@@ -153,9 +99,6 @@
         </div>
       </div>
 
-    </main>
-  </div>
-
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       // Format prices
@@ -178,6 +121,5 @@
       });
     });
   </script>
-</body>
-</html>
+{{ template "layouts/app_footer" . }}
 {{ end }}

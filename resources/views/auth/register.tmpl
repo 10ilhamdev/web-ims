@@ -1,11 +1,11 @@
 {{ define "auth/register.tmpl" }}
-{{ template "layouts/header.tmpl" . }}
+{{ template "layouts/guest_header" . }}
 
 <section class="container">
   <div class="form-container animated">
     <div style="text-align: center; margin-bottom: 2rem;">
-      <h2 style="font-size: 2rem; font-family: var(--font-mono); margin-bottom: 0.5rem;">Create Account</h2>
-      <p style="color: var(--text-secondary);">Start your digital transformation journey with IMS</p>
+      <h2 style="font-size: 2rem; font-family: var(--font-mono); margin-bottom: 0.5rem;" data-translate="register_title">Create Account</h2>
+      <p style="color: var(--text-secondary);" data-translate="register_desc">Start your digital transformation journey with IMS</p>
     </div>
 
     {{ if .Error }}
@@ -16,31 +16,31 @@
 
     <form action="/register" method="POST">
       <div class="form-group">
-        <label for="name" class="form-label">Full Name</label>
+        <label for="name" class="form-label" data-translate="name_label">Full Name</label>
         <input type="text" id="name" name="name" class="form-control" placeholder="John Doe" required>
       </div>
 
       <div class="form-group">
-        <label for="email" class="form-label">Email Address</label>
+        <label for="email" class="form-label" data-translate="email_label">Email Address</label>
         <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" required>
       </div>
 
       <div class="form-group" style="margin-bottom: 2rem;">
-        <label for="password" class="form-label">Password</label>
+        <label for="password" class="form-label" data-translate="password_label">Password</label>
         <input type="password" id="password" name="password" class="form-control" placeholder="Min. 8 characters"
           required>
       </div>
 
       <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.75rem;">
-        <i class="fa-solid fa-user-plus"></i> Register
+        <i class="fa-solid fa-user-plus"></i> <span data-translate="btn_register">Register</span>
       </button>
     </form>
 
     <div style="text-align: center; margin-top: 2rem; color: var(--text-secondary); font-size: 0.95rem;">
-      Already have an account? <a href="/login" style="color: var(--accent-primary); font-weight: 600;">Sign In here</a>
+      <span data-translate="already_account">Already have an account?</span> <a href="/login" style="color: var(--accent-primary); font-weight: 600;" data-translate="signin_here">Sign In here</a>
     </div>
   </div>
 </section>
 
-{{ template "layouts/footer.tmpl" . }}
+{{ template "layouts/guest_footer" . }}
 {{ end }}

@@ -1,0 +1,188 @@
+{{ define "admin/cms.tmpl" }}
+{{ template "layouts/app_header" . }}
+      <!-- Top header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+        <div>
+          <h1 style="font-size: 2rem;" data-translate="cms_title">CMS Guest Pages</h1>
+          <p style="color: var(--text-secondary); margin-top: 0.25rem;" data-translate="cms_desc">Manage all guest site pages and access their individual content blocks.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+          <i class="fa-solid fa-plus-circle"></i> <span data-translate="cms_add_new">Tambah Halaman</span>
+        </button>
+      </div>
+
+      <!-- Pages DataTable -->
+      <div class="card" style="border-color: var(--border-color); background: var(--bg-secondary); padding: 2rem;">
+        <table id="pagesTable" class="display" style="width:100%">
+          <thead>
+            <tr>
+              <th data-translate="col_page_name">Page Name</th>
+              <th data-translate="col_type_key">Page Type / Key</th>
+              <th data-translate="col_order">Display Order</th>
+              <th style="width: 250px;" data-translate="col_actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .Pages }}
+              <tr>
+                <td style="font-weight: 600; color: var(--text-primary);" data-translate="type_{{ .Type }}">{{ .Name }}</td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent-secondary);">
+                  <span data-translate="type_{{ .Type }}">{{ .Type }}</span>
+                </td>
+                <td style="font-weight: bold;">{{ .Order }}</td>
+                <td>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <a href="/admin/cms/pages/{{ .ID }}" class="btn btn-primary btn-sm" style="background: var(--info); border-color: var(--info); padding: 0.4rem 0.8rem; font-size: 0.8rem; gap: 0.4rem;">
+                      <i class="fa-solid fa-folder-open"></i> Detail
+                    </a>
+                    <button class="btn btn-secondary btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; gap: 0.4rem;" 
+                      onclick="openEditModal('{{ .ID }}', '{{ .Name }}', '{{ .Type }}', '{{ .Order }}')">
+                      <i class="fa-solid fa-edit"></i> Edit
+                    </button>
+                    <form action="/admin/cms/pages/{{ .ID }}/delete" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus halaman ini beserta seluruh isinya?');" style="display:inline;">
+                      <button type="submit" class="btn btn-danger btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+
+  <!-- Create Page Modal -->
+  <div class="cms-modal" id="createPageModal">
+    <div class="cms-modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
+        <h3 style="font-size: 1.35rem;"><i class="fa-solid fa-folder-plus" style="color: var(--accent-primary); margin-right: 0.5rem;"></i> Tambah Halaman</h3>
+        <button style="background:none; border:none; color:var(--text-secondary); font-size: 1.5rem; cursor:pointer;" onclick="closeCreateModal()">&times;</button>
+      </div>
+      <form action="/admin/cms/pages" method="POST">
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label class="form-label">Nama Halaman</label>
+          <input type="text" name="name" class="form-control" placeholder="e.g. Beranda" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label class="form-label">Tipe / Key Halaman</label>
+          <select name="type" class="form-control" required>
+            <option value="home" data-translate="type_home">home</option>
+            <option value="services" data-translate="type_services">services</option>
+            <option value="products" data-translate="type_products">products</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 2rem;">
+          <label class="form-label">Urutan Halaman</label>
+          <input type="number" name="order" class="form-control" placeholder="e.g. 1" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.8rem;">
+          <i class="fa-solid fa-save"></i> Simpan Halaman
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Page Modal -->
+  <div class="cms-modal" id="editPageModal">
+    <div class="cms-modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
+        <h3 style="font-size: 1.35rem;"><i class="fa-solid fa-pen-to-square" style="color: var(--accent-secondary); margin-right: 0.5rem;"></i> Edit Halaman</h3>
+        <button style="background:none; border:none; color:var(--text-secondary); font-size: 1.5rem; cursor:pointer;" onclick="closeEditModal()">&times;</button>
+      </div>
+      <form id="editPageForm" method="POST">
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label class="form-label">Nama Halaman</label>
+          <input type="text" name="name" id="editPageName" class="form-control" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label class="form-label">Tipe / Key Halaman</label>
+          <select name="type" id="editPageType" class="form-control" required>
+            <option value="home" data-translate="type_home">home</option>
+            <option value="services" data-translate="type_services">services</option>
+            <option value="products" data-translate="type_products">products</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 2rem;">
+          <label class="form-label">Urutan Halaman</label>
+          <input type="number" name="order" id="editPageOrder" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.8rem; background: linear-gradient(135deg, var(--accent-secondary) 0%, #10b981 100%);">
+          <i class="fa-solid fa-check"></i> Simpan Perubahan
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      const currentLang = localStorage.getItem('lang') || 'id';
+      const langConfig = currentLang === 'en' ? {
+        search: "Search Page:",
+        lengthMenu: "Show _MENU_ entries per page",
+        info: "Showing _START_ to _END_ of _TOTAL_ pages",
+        paginate: {
+          first: "First",
+          last: "Last",
+          next: "Next",
+          previous: "Previous"
+        }
+      } : {
+        search: "Cari Halaman:",
+        lengthMenu: "Tampilkan _MENU_ data per halaman",
+        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ halaman",
+        paginate: {
+          first: "Pertama",
+          last: "Terakhir",
+          next: "Selanjutnya",
+          previous: "Sebelumnya"
+        }
+      };
+
+      $('#pagesTable').DataTable({
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        ordering: true,
+        language: langConfig,
+        drawCallback: function() {
+          if (typeof applyAdminTranslations === 'function') {
+            applyAdminTranslations(localStorage.getItem('lang') || 'id');
+          }
+        }
+      });
+    });
+
+    function openCreateModal() {
+      document.getElementById('createPageModal').style.display = 'flex';
+    }
+    function closeCreateModal() {
+      document.getElementById('createPageModal').style.display = 'none';
+    }
+
+    function openEditModal(id, name, type, order) {
+      document.getElementById('editPageForm').action = '/admin/cms/pages/' + id + '/edit';
+      document.getElementById('editPageName').value = name;
+      document.getElementById('editPageType').value = type;
+      document.getElementById('editPageOrder').value = order;
+      document.getElementById('editPageModal').style.display = 'flex';
+    }
+    function closeEditModal() {
+      document.getElementById('editPageModal').style.display = 'none';
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+      const createModal = document.getElementById('createPageModal');
+      const editModal = document.getElementById('editPageModal');
+      if (event.target == createModal) {
+        closeCreateModal();
+      }
+      if (event.target == editModal) {
+        closeEditModal();
+      }
+    }
+  </script>
+{{ template "layouts/app_footer" . }}
+{{ end }}

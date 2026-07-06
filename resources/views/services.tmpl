@@ -1,5 +1,5 @@
 {{ define "services.tmpl" }}
-{{ template "layouts/header.tmpl" . }}
+{{ template "layouts/guest_header" . }}
 
 <section class="container animated" style="padding-top: 4rem; padding-bottom: 6rem;">
   <div class="section-header reveal reveal-up">
@@ -55,15 +55,61 @@
     <div class="feature-card reveal reveal-left">
       <div class="feature-icon" style="color: var(--accent-primary);"><i class="fa-solid fa-cloud"></i></div>
       <h3 class="feature-title" data-translate="service_cloud_title">Infrastruktur Cloud</h3>
-      <p class="feature-desc" data-translate="service_cloud_desc">Orkestrasi Docker, penyebaran AWS/GCP, alur integrasi
-        dan pengiriman berkelanjutan (CI/CD), dan pemantauan server.</p>
+      <p class="feature-desc" data-translate="service_cloud_desc">Orkestrasi Docker, penyebaran AWS/GCP, alur integrasi dan pengiriman berkelanjutan (CI/CD), dan pemantauan server.</p>
     </div>
 
     <div class="feature-card reveal reveal-right">
       <div class="feature-icon" style="color: var(--danger);"><i class="fa-solid fa-lock"></i></div>
       <h3 class="feature-title" data-translate="service_security_title">Keamanan & Kriptografi</h3>
-      <p class="feature-desc" data-translate="service_security_desc">Enkripsi ujung-ke-ujung, logika tanda tangan
-        digital, audit basis data yang aman, dan penilaian kepatuhan keamanan.</p>
+      <p class="feature-desc" data-translate="service_security_desc">Enkripsi ujung-ke-ujung, logika tanda tangan digital, audit basis data yang aman, dan penilaian kepatuhan keamanan.</p>
+    </div>
+
+    <div class="feature-card reveal reveal-left">
+      <div class="feature-icon" style="color: #00add8;"><i class="fa-brands fa-golang"></i></div>
+      <h3 class="feature-title" data-translate="service_golang_title">Pengembangan Backend Golang</h3>
+      <p class="feature-desc" data-translate="service_golang_desc">Membangun microservices berkinerja tinggi, API gRPC/REST, dan pemrosesan paralel cepat dengan keamanan memori optimal.</p>
+    </div>
+
+    <div class="feature-card reveal reveal-up">
+      <div class="feature-icon" style="color: #4285f4;"><i class="fa-brands fa-google"></i></div>
+      <h3 class="feature-title" data-translate="service_integration_title">Integrasi Layanan Google & CDN</h3>
+      <p class="feature-desc" data-translate="service_integration_desc">Penyimpanan cloud Google Drive, pelacakan trafik dengan Google Analytics, dan optimasi kecepatan dengan CDN Cloudflare.</p>
+    </div>
+
+    <div class="feature-card reveal reveal-right">
+      <div class="feature-icon" style="color: #10b981;"><i class="fa-solid fa-chart-pie"></i></div>
+      <h3 class="feature-title" data-translate="service_charting_title">Visualisasi Data & Grafik</h3>
+      <p class="feature-desc" data-translate="service_charting_desc">Pembuatan dashboard analitik interaktif menggunakan CDN pustaka grafik (Chart.js, ApexCharts) untuk pie chart, bar chart, dan line chart.</p>
+    </div>
+
+    <div class="feature-card reveal reveal-left">
+      <div class="feature-icon" style="color: #a855f7;"><i class="fa-solid fa-vr-cardboard"></i></div>
+      <h3 class="feature-title" data-translate="service_vr_title">Ruangan Virtual & 3D WebGL</h3>
+      <p class="feature-desc" data-translate="service_vr_desc">Membangun tur virtual 3D, showroom interaktif, dan ruang virtual imersif berbasis Three.js, A-Frame, dan WebGL.</p>
+    </div>
+
+    <div class="feature-card reveal reveal-up">
+      <div class="feature-icon" style="color: #eab308;"><i class="fa-solid fa-book-open"></i></div>
+      <h3 class="feature-title" data-translate="service_flipbook_title">Flipbook & Media Interaktif</h3>
+      <p class="feature-desc" data-translate="service_flipbook_desc">Konversi PDF ke flipbook interaktif 3D (Turn.js, dFlip) dengan efek balik halaman realistis untuk katalog, brosur, dan majalah digital.</p>
+    </div>
+
+    <div class="feature-card reveal reveal-right">
+      <div class="feature-icon" style="color: #3b82f6;"><i class="fa-solid fa-video"></i></div>
+      <h3 class="feature-title" data-translate="service_realtime_title">Komunikasi Real-Time & WebRTC</h3>
+      <p class="feature-desc" data-translate="service_realtime_desc">Mengintegrasikan WebRTC dan WebSockets untuk konferensi video peer-to-peer, chat real-time, kolaborasi multi-pengguna, dan live streaming.</p>
+    </div>
+
+    <div class="feature-card reveal reveal-left">
+      <div class="feature-icon" style="color: #ec4899;"><i class="fa-solid fa-mobile-screen-button"></i></div>
+      <h3 class="feature-title" data-translate="service_pwa_title">Progressive Web App (PWA)</h3>
+      <p class="feature-desc" data-translate="service_pwa_desc">Menciptakan aplikasi web yang dapat diinstal langsung di perangkat user, berjalan secara offline (Service Workers), dan mendukung push notifications.</p>
+    </div>
+
+    <div class="feature-card reveal reveal-up">
+      <div class="feature-icon" style="color: #14b8a6;"><i class="fa-solid fa-bolt"></i></div>
+      <h3 class="feature-title" data-translate="service_wasm_title">High-Performance WebAssembly (Wasm)</h3>
+      <p class="feature-desc" data-translate="service_wasm_desc">Kompilasi kode C++/Rust ke Wasm untuk memproses data berat langsung di browser, seperti editor video/gambar dan game web.</p>
     </div>
   </div>
 
@@ -81,5 +127,5 @@
   </div>
 </section>
 
-{{ template "layouts/footer.tmpl" . }}
+{{ template "layouts/guest_footer" . }}
 {{ end }}

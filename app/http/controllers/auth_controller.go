@@ -46,6 +46,9 @@ func (r *AuthController) Login(ctx http.Context) http.Response {
 	// Store in session
 	ctx.Request().Session().Put("user_id", user.ID)
 
+	// Record login activity
+	RecordActivity(ctx, &user, "Login")
+
 	if user.Role == "admin" {
 		return ctx.Response().Redirect(http.StatusFound, "/admin")
 	}
@@ -109,6 +112,10 @@ func (r *AuthController) Register(ctx http.Context) http.Response {
 
 // Logout clears session and redirects
 func (r *AuthController) Logout(ctx http.Context) http.Response {
+	user := GetCurrentUser(ctx)
+	if user != nil {
+		RecordActivity(ctx, user, "Logout")
+	}
 	ctx.Request().Session().Forget("user_id")
 	return ctx.Response().Redirect(http.StatusFound, "/")
 }
