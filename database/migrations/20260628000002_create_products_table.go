@@ -18,6 +18,8 @@ func (r *M20260628000002CreateProductsTable) Up() error {
 			table.String("name")
 			table.Text("description")
 			table.Double("price")
+			table.Double("original_price")
+			table.Double("discount")
 			table.Text("features")
 			table.String("image")
 			table.DateTime("created_at")

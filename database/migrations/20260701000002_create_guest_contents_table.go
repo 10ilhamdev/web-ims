@@ -19,6 +19,8 @@ func (r *M20260701000002CreateGuestContentsTable) Up() error {
 			table.String("key")
 			table.Text("value_id")
 			table.Text("value_en")
+			table.String("section").Nullable()
+			table.String("style").Nullable()
 			table.DateTime("created_at")
 			table.DateTime("updated_at")
 			table.DateTime("deleted_at").Nullable()

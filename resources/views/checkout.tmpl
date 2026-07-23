@@ -20,7 +20,7 @@
         <span style="font-weight: 600;">Package Price</span>
         <span style="color: var(--accent-secondary); font-family: var(--font-mono); font-weight: 700; font-size: 1.25rem;">
           {{ if gt .Product.Price 0.0 }}
-            Rp <span class="price-format" data-price="{{ .Product.Price }}">{{ .Product.Price }}</span>
+            <span data-translate-currency>Rp</span> <span class="price-format" data-price="{{ .Product.Price }}">{{ .Product.Price }}</span>
           {{ else }}
             Didiskusikan (TBD)
           {{ end }}
@@ -48,13 +48,26 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // Format prices nicely in IDR currency
-    document.querySelectorAll('.price-format').forEach(el => {
-      const val = parseFloat(el.getAttribute('data-price'));
-      if (!isNaN(val)) {
-        el.textContent = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(val);
-      }
-    });
+    function updatePrices() {
+      const lang = localStorage.getItem('lang') || 'en';
+      document.querySelectorAll('.price-format').forEach(el => {
+        const val = parseFloat(el.getAttribute('data-price'));
+        if (!isNaN(val)) {
+          if (lang === 'en') {
+            let usd = val / 15000;
+            if (val === 500000) usd = 35;
+            if (val === 4500000) usd = 300;
+            el.textContent = new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(usd);
+          } else {
+            el.textContent = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(val);
+          }
+        }
+      });
+      document.querySelectorAll('[data-translate-currency]').forEach(el => {
+        el.textContent = lang === 'en' ? '$' : 'Rp';
+      });
+    }
+    updatePrices();
   });
 </script>
 {{ template "layouts/guest_footer" . }}

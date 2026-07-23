@@ -16,5 +16,8 @@ func Migrations() []schema.Migration {
 		&migrations.M20260701000004CreateCmsPagesTable{},
 		&migrations.M20260701000002CreateGuestContentsTable{},
 		&migrations.M20260701131613CreateRolesTable{},
+		&migrations.M20260711000000CreateChatsTables{},
+		&migrations.M20260712000001CreateAdminsTable{},
+		&migrations.M20260712000002CreateCustomersTable{},
 	}
 }

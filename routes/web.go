@@ -17,6 +17,13 @@ func Web() {
 	facades.Route().Get("/services", guestController.Services)
 	facades.Route().Get("/products", guestController.Products)
 
+	// Chat API Routes
+	chatController := controllers.NewChatController()
+	facades.Route().Post("/api/chat/ai", chatController.AskAI)
+	facades.Route().Post("/api/chat/support/init", chatController.InitSupport)
+	facades.Route().Post("/api/chat/support/send", chatController.SendSupportMessage)
+	facades.Route().Get("/api/chat/support/messages", chatController.GetSupportMessages)
+
 	// Auth Guest Routes
 	authController := controllers.NewAuthController()
 	facades.Route().Middleware(middleware.Guest()).Group(func(router route.Router) {
@@ -49,9 +56,18 @@ func Web() {
 		router.Get("/admin", adminController.Dashboard)
 		router.Post("/admin/orders/{order_id}/status", adminController.UpdateStatus)
 
+		// Admin Support Chat
+		router.Get("/admin/chat", chatController.AdminChatView)
+		router.Get("/api/admin/chat/sessions", chatController.AdminGetSessions)
+		router.Post("/api/admin/chat/reply", chatController.AdminSendReply)
+
 		// Admin User Management
 		router.Get("/admin/users", adminController.Users)
+		router.Get("/admin/users/create", adminController.CreateUserForm)
 		router.Post("/admin/users", adminController.CreateUser)
+		router.Get("/admin/users/{user_id}", adminController.UserDetail)
+		router.Get("/admin/users/{user_id}/edit", adminController.EditUserForm)
+		router.Post("/admin/users/{user_id}/edit", adminController.UpdateUser)
 		router.Post("/admin/users/{user_id}/delete", adminController.DeleteUser)
 
 		// Admin CMS Management
@@ -63,6 +79,8 @@ func Web() {
 		router.Get("/admin/cms/pages/{page_id}", adminController.CmsPageDetail)
 		router.Post("/admin/cms/pages/{page_id}/contents", adminController.UpdateCmsPageContents)
 		router.Post("/admin/cms/pages/{page_id}/contents/create", adminController.CreateCmsPageContent)
+		router.Post("/admin/cms/products/{product_id}/price", adminController.UpdateProductPrice)
+		router.Post("/admin/cms/contents/{content_id}/delete", adminController.DeleteCmsPageContent)
 
 		// Admin Role & DB Schema Management
 		router.Get("/admin/roles", adminController.Roles)

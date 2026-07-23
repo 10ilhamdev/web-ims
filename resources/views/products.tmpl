@@ -46,18 +46,13 @@
       <div class="product-price-box" style="align-items: center; flex-wrap: wrap; gap: 0.75rem; min-height: 4rem; margin: 1.5rem 0;">
         {{ if gt .Price 0.0 }}
           <div style="display: flex; align-items: baseline;">
-            <span class="product-currency">Rp</span>
-            <span class="product-price price-format" data-price="{{ .Price }}">{{ .Price }}</span>
+            <span class="product-currency" data-translate-currency>Rp</span>
+            <span class="product-price price-format" data-price="{{ printf "%.0f" .Price }}">{{ printf "%.0f" .Price }}</span>
           </div>
-          <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem;">
-            {{ if eq .ID 1 }}
-              <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.95rem; font-weight: 500;">Rp 2.500.000</span>
-              <span class="discount-pill">HEMAT 40%</span>
-            {{ else if eq .ID 2 }}
-              <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.95rem; font-weight: 500;">Rp 8.000.000</span>
-              <span class="discount-pill">HEMAT 44%</span>
+            {{ if gt .OriginalPrice 0.0 }}
+              <span class="original-price" data-original-price="{{ printf "%.0f" .OriginalPrice }}" style="text-decoration: line-through; color: var(--text-muted); font-size: 0.95rem; font-weight: 500;">Rp {{ printf "%.0f" .OriginalPrice }}</span>
+              <span class="discount-pill" data-original-price="{{ printf "%.0f" .OriginalPrice }}" data-current-price="{{ printf "%.0f" .Price }}"></span>
             {{ end }}
-          </div>
         {{ else }}
           <span class="product-price" style="font-size: 1.8rem; font-family: inherit;" data-translate="product_price_negotiable">Hubungi Kami</span>
         {{ end }}
@@ -74,16 +69,16 @@
             <path d="M6 10L9 13L14 7" stroke="#2563eb" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round" />
           </svg>
-          <span>{{ . }}</span>
+          <span data-translate-val="{{ . }}">{{ . }}</span>
         </li>
         {{ end }}
       </ul>
 
       <a href="/checkout/{{ .ID }}" class="btn btn-primary" style="justify-content: center; width: 100%;">
         {{ if gt .Price 0.0 }}
-          <i class="fa-solid fa-shopping-cart"></i> <span data-translate="products_btn_order">Order Now</span>
+          <i class="fa-solid fa-shopping-cart"></i> <span data-translate="product_btn_{{ .ID }}">Order Now</span>
         {{ else }}
-          <i class="fa-solid fa-comments"></i> <span data-translate="products_btn_discuss">Hubungi Kami</span>
+          <i class="fa-solid fa-comments"></i> <span data-translate="product_btn_{{ .ID }}">Hubungi Kami</span>
         {{ end }}
       </a>
     </div>
@@ -93,13 +88,65 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // Format prices nicely in IDR currency
-    document.querySelectorAll('.price-format').forEach(el => {
-      const val = parseFloat(el.getAttribute('data-price'));
-      if (!isNaN(val)) {
-        el.textContent = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(val);
+    function updatePrices() {
+      const lang = localStorage.getItem('lang') || 'en';
+      
+      // Update main prices
+      document.querySelectorAll('.price-format').forEach(el => {
+        const val = parseFloat(el.getAttribute('data-price'));
+        if (!isNaN(val)) {
+          if (lang === 'en') {
+            let usd = Math.round(val / 15000);
+            el.textContent = new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(usd);
+          } else {
+            el.textContent = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(val);
+          }
+        }
+      });
+
+      // Update currency indicators
+      document.querySelectorAll('[data-translate-currency]').forEach(el => {
+        el.textContent = lang === 'en' ? '$' : 'Rp';
+      });
+
+      // Update original line-through prices
+      document.querySelectorAll('.original-price').forEach(el => {
+        const val = parseFloat(el.getAttribute('data-original-price'));
+        if (!isNaN(val)) {
+          if (lang === 'en') {
+            let usd = Math.round(val / 15000);
+            el.textContent = '$' + new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(usd);
+          } else {
+            el.textContent = 'Rp ' + new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(val);
+          }
+        }
+      });
+
+      // Update discount pills dynamically
+      document.querySelectorAll('.discount-pill').forEach(el => {
+        const orig = parseFloat(el.getAttribute('data-original-price'));
+        const curr = parseFloat(el.getAttribute('data-current-price'));
+        if (!isNaN(orig) && !isNaN(curr) && orig > 0) {
+          const pct = Math.round((1 - (curr / orig)) * 100);
+          if (lang === 'en') {
+            el.textContent = 'SAVE ' + pct + '%';
+          } else {
+            el.textContent = 'HEMAT ' + pct + '%';
+          }
+        }
+      });
+    }
+
+    updatePrices();
+
+    // Listen for language change to update prices
+    const oldChangeLanguage = window.changeLanguage;
+    window.changeLanguage = function(lang) {
+      if (typeof oldChangeLanguage === 'function') {
+        oldChangeLanguage(lang);
       }
-    });
+      updatePrices();
+    };
 
     // Dynamically assign reveal classes to product cards based on index
     document.querySelectorAll('.product-card').forEach((card, index) => {

@@ -33,7 +33,7 @@
           <div>
             <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; font-weight: 600;" data-translate="dash_total_revenue">Total Revenue</div>
             <div class="stat-val" style="font-size: 1.5rem; margin-top: 0.8rem; color: var(--success);">
-              Rp <span class="price-format" data-price="{{ .TotalRevenue }}">{{ .TotalRevenue }}</span>
+              <span data-translate-currency>Rp</span> <span class="price-format" data-price="{{ .TotalRevenue }}">{{ .TotalRevenue }}</span>
             </div>
           </div>
           <div class="stat-icon" style="color: var(--success);"><i class="fa-solid fa-wallet"></i></div>
@@ -44,38 +44,39 @@
             <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; font-weight: 600;" data-translate="dash_registered_clients">Registered Clients</div>
             <div class="stat-val">{{ .TotalClients }}</div>
           </div>
-          <div class="stat-icon" style="color: var(--accent-secondary);"><i class="fa-solid fa-users"></i></div>
+          <div class="stat-icon" style="color: var(--accent-primary);"><i class="fa-solid fa-users"></i></div>
         </div>
       </div>
 
-      <!-- Orders Panel -->
-      <div class="card" style="border-color: var(--border-color); background: var(--bg-secondary);">
-        <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-list" style="margin-right: 0.5rem; color: var(--accent-primary);"></i> <span data-translate="dash_orders_list">Client Orders List</span></h3>
-        
-        <div class="table-responsive">
-          <table>
+      <!-- Recent Orders Section -->
+      <div class="card" style="margin-top: 2rem; border-color: var(--border-color);">
+        <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="font-size: 1.1rem; font-family: var(--font-mono); margin: 0;" data-translate="dash_recent_orders">Recent Orders</h3>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="admin-table">
             <thead>
               <tr>
-                <th data-translate="col_order_id">Order ID</th>
-                <th data-translate="col_client_name">Client Name</th>
-                <th data-translate="col_package_name">Package Name</th>
-                <th data-translate="col_price">Price</th>
-                <th data-translate="col_status">Status</th>
-                <th data-translate="col_update_status">Update Status</th>
-                <th data-translate="col_placed_date">Placed Date</th>
+                <th style="width: 80px;">ID</th>
+                <th data-translate="dash_col_client">Client</th>
+                <th data-translate="dash_col_package">Package</th>
+                <th data-translate="dash_col_price">Price</th>
+                <th data-translate="dash_col_status">Status</th>
+                <th data-translate="dash_col_action">Action</th>
+                <th data-translate="dash_col_date">Date</th>
               </tr>
             </thead>
             <tbody>
-              {{ range .Orders }}
+              {{ range .RecentOrders }}
                 <tr>
                   <td style="font-family: var(--font-mono); font-weight: 600; color: var(--accent-primary);">#IMS-{{ .ID }}</td>
                   <td>
                     <div style="font-weight: 600;">{{ .User.Name }}</div>
-                    <div style="font-size: 0.8rem; color: var(--text-secondary);">{{ .User.Email }}</div>
+                    <div style="font-size: 0.78rem; color: var(--text-secondary);">{{ .User.Email }}</div>
                   </td>
                   <td style="font-weight: 600;">{{ .Product.Name }}</td>
                   <td style="font-family: var(--font-mono); font-weight: 600;">
-                    Rp <span class="price-format" data-price="{{ .Price }}">{{ .Price }}</span>
+                    <span data-translate-currency>Rp</span> <span class="price-format" data-price="{{ .Price }}">{{ .Price }}</span>
                   </td>
                   <td>
                     <span class="badge badge-{{ .Status }}">{{ .Status }}</span>
@@ -101,13 +102,26 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // Format prices
-      document.querySelectorAll('.price-format').forEach(el => {
-        const val = parseFloat(el.getAttribute('data-price'));
-        if (!isNaN(val)) {
-          el.textContent = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(val);
-        }
-      });
+      function updatePrices() {
+        const lang = localStorage.getItem('lang') || 'en';
+        document.querySelectorAll('.price-format').forEach(el => {
+          const val = parseFloat(el.getAttribute('data-price'));
+          if (!isNaN(val)) {
+            if (lang === 'en') {
+              let usd = val / 15000;
+              if (val === 500000) usd = 35;
+              if (val === 4500000) usd = 300;
+              el.textContent = new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(usd);
+            } else {
+              el.textContent = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(val);
+            }
+          }
+        });
+        document.querySelectorAll('[data-translate-currency]').forEach(el => {
+          el.textContent = lang === 'en' ? '$' : 'Rp';
+        });
+      }
+      updatePrices();
 
       // Format dates
       document.querySelectorAll('.date-format').forEach(el => {

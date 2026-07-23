@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel | IMS Control Panel</title>
-  <link rel="stylesheet" href="/public/css/style.css?v=100">
+  <link rel="icon" type="image/png" href="/public/img/logo_ims.png?v=2">
+  <link rel="stylesheet" href="/public/css/style.css?v=101">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- DataTables CSS (Included only in admin panel) -->
@@ -87,6 +88,9 @@
   </style>
 </head>
 <body style="background-image: none; background-color: var(--bg-primary);">
+  <!-- Sunset Theme Sun Graphic -->
+  <div class="sunset-sun"></div>
+
   <div class="admin-layout">
     
     <!-- Sidebar -->
@@ -117,6 +121,10 @@
           
           <li>
             <a href="/admin/cms"><i class="fa-solid fa-file-pen"></i> <span data-translate="menu_cms">CMS Pages</span></a>
+          </li>
+          
+          <li>
+            <a href="/admin/chat"><i class="fa-solid fa-comments"></i> <span data-translate="menu_support_chat">Support Chat</span></a>
           </li>
           
         <li class="has-submenu">
@@ -166,7 +174,8 @@
           <div class="interface-controls" style="display: flex; align-items: center; gap: 0.75rem;">
             <button class="btn-icon" id="admin-theme-toggle" onclick="toggleTheme()" title="Toggle Theme" style="border: 1px solid var(--border-color); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-primary); transition: var(--transition-smooth);">
               <i class="fa-solid fa-sun" style="display:none;" id="sun-icon"></i>
-              <i class="fa-solid fa-moon" id="moon-icon"></i>
+              <i class="fa-solid fa-moon" style="display:none;" id="moon-icon"></i>
+              <i class="fa-solid fa-mountain-sun" style="display:none;" id="sunset-icon"></i>
             </button>
             <select class="select-lang" id="lang-select" onchange="changeLanguage(this.value)" title="Change Language" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 1rem; color: var(--text-primary); font-family: inherit; font-size: 0.9rem; cursor: pointer; outline: none; transition: var(--transition-smooth);">
               <option value="id">ID</option>
@@ -251,6 +260,7 @@
         menu_password: "Ubah Password",
         menu_activity: "Riwayat Aktivitas",
         menu_logout: "Keluar",
+        menu_support_chat: "Obrolan Dukungan",
         
         dash_title: "Ikhtisar & Manajemen",
         dash_desc: "Selamat datang kembali, administrator. Kelola operasi penjualan di sini.",
@@ -313,7 +323,33 @@
         
         type_home: "Beranda",
         type_services: "Layanan",
-        type_products: "Produk"
+        type_products: "Produk",
+        type_general: "Navigasi & Umum",
+
+        cms_detail_title: "Manajemen Konten",
+        cms_detail_desc: "Mengedit isi teks, terjemahan, slogan, dan informasi yang terdaftar pada halaman",
+        add_new_key: "Tambah Key Baru",
+        category_section: "Kategori / Seksi (Section)",
+        style_type: "Gaya / Jenis Konten (Style)",
+        content_key: "Kunci Konten (Key)",
+        content_id: "Konten ID (Indonesian)",
+        content_en: "Konten EN (English)",
+        btn_add_key: "Tambah Key",
+        btn_delete_key: "Hapus Key",
+        btn_save_section: "Simpan Seksi Ini",
+        price_settings: "Pengaturan Harga & Diskon Paket",
+        original_price: "Harga Asli (Rupiah)",
+        discount_percent: "Diskon (%)",
+        btn_save: "Simpan",
+        price_after_discount: "Harga Setelah Diskon (Otomatis)",
+        add_key_desc: "Tambahkan kunci terjemahan baru yang akan dimuat dinamis pada halaman guest.",
+        style_general: "Umum / Text Biasa",
+        style_title: "Judul / Title",
+        style_text: "Deskripsi / Detail Text",
+        style_button: "Tombol / Button",
+        style_feature: "Fitur / List Item",
+        placeholder_value_id: "Teks Terjemahan Indonesia",
+        placeholder_value_en: "Teks Terjemahan Inggris"
       },
       en: {
         control_panel: "IMS CONTROL PANEL",
@@ -351,6 +387,7 @@
         menu_password: "Password",
         menu_activity: "Activity Logs",
         menu_logout: "Logout",
+        menu_support_chat: "Support Chat",
         
         dash_title: "Overview & Management",
         dash_desc: "Welcome back, administrator. Manage sales operations here.",
@@ -413,7 +450,33 @@
         
         type_home: "Home",
         type_services: "Services",
-        type_products: "Products"
+        type_products: "Products",
+        type_general: "Navigation & General",
+
+        cms_detail_title: "Content Management",
+        cms_detail_desc: "Edit text content, translations, slogans, and information registered on page",
+        add_new_key: "Add New Key",
+        category_section: "Category / Section",
+        style_type: "Content Style / Type",
+        content_key: "Content Key (Key)",
+        content_id: "ID Content (Indonesian)",
+        content_en: "EN Content (English)",
+        btn_add_key: "Add Key",
+        btn_delete_key: "Delete Key",
+        btn_save_section: "Save This Section",
+        price_settings: "Package Pricing & Discount Settings",
+        original_price: "Original Price (Rupiah)",
+        discount_percent: "Discount (%)",
+        btn_save: "Save",
+        price_after_discount: "Price After Discount (Automatic)",
+        add_key_desc: "Add a new translation key that will be loaded dynamically on the guest page.",
+        style_general: "General / Plain Text",
+        style_title: "Header / Title",
+        style_text: "Description / Detail Text",
+        style_button: "Button / Link",
+        style_feature: "Feature / List Item",
+        placeholder_value_id: "Indonesian Translation Text",
+        placeholder_value_en: "English Translation Text"
       }
     };
 
@@ -432,26 +495,58 @@
       if (menu) menu.style.display = 'none';
     });
 
-    // Dark/Light Theme Toggling
-    const sunIcon = document.getElementById('sun-icon');
-    const moonIcon = document.getElementById('moon-icon');
+    // Theme Switching (Dark -> Light -> Sunset)
+    const sunIcons = document.querySelectorAll('#sun-icon');
+    const moonIcons = document.querySelectorAll('#moon-icon');
+    const sunsetIcons = document.querySelectorAll('#sunset-icon');
 
     function toggleTheme() {
-      const isLight = document.documentElement.classList.toggle('light-theme');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      let currentTheme = 'dark';
+      if (document.documentElement.classList.contains('light-theme')) {
+        currentTheme = 'light';
+      } else if (document.documentElement.classList.contains('sunset-theme')) {
+        currentTheme = 'sunset';
+      }
+
+      document.documentElement.classList.remove('light-theme', 'sunset-theme');
+
+      let nextTheme = 'dark';
+      if (currentTheme === 'dark') {
+        nextTheme = 'light';
+        document.documentElement.classList.add('light-theme');
+      } else if (currentTheme === 'light') {
+        nextTheme = 'sunset';
+        document.documentElement.classList.add('sunset-theme');
+      } else {
+        nextTheme = 'dark';
+      }
+
+      localStorage.setItem('theme', nextTheme);
       updateThemeIcons();
     }
 
     function updateThemeIcons() {
-      const isLight = document.documentElement.classList.contains('light-theme');
-      if (sunIcon && moonIcon) {
-        if (isLight) {
-          sunIcon.style.display = 'inline-block';
-          moonIcon.style.display = 'none';
-        } else {
-          sunIcon.style.display = 'none';
-          moonIcon.style.display = 'inline-block';
-        }
+      let theme = 'dark';
+      if (document.documentElement.classList.contains('light-theme')) {
+        theme = 'light';
+      } else if (document.documentElement.classList.contains('sunset-theme')) {
+        theme = 'sunset';
+      }
+
+      const sunIcons = document.querySelectorAll('#sun-icon');
+      const moonIcons = document.querySelectorAll('#moon-icon');
+      const sunsetIcons = document.querySelectorAll('#sunset-icon');
+
+      sunIcons.forEach(el => el.style.display = 'none');
+      moonIcons.forEach(el => el.style.display = 'none');
+      sunsetIcons.forEach(el => el.style.display = 'none');
+
+      if (theme === 'light') {
+        sunIcons.forEach(el => el.style.display = 'inline-block');
+      } else if (theme === 'sunset') {
+        sunsetIcons.forEach(el => el.style.display = 'inline-block');
+      } else {
+        moonIcons.forEach(el => el.style.display = 'inline-block');
       }
     }
 
@@ -468,7 +563,7 @@
     }
 
     function applyAdminTranslations(lang) {
-      const dict = adminTranslations[lang] || adminTranslations['id'];
+      const dict = adminTranslations[lang] || adminTranslations['en'];
       document.querySelectorAll('[data-translate]').forEach(el => {
         const key = el.getAttribute('data-translate');
         if (dict[key]) {
@@ -530,15 +625,16 @@
     document.addEventListener('DOMContentLoaded', () => {
       // Theme setup
       const currentTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.classList.remove('light-theme', 'sunset-theme');
       if (currentTheme === 'light') {
         document.documentElement.classList.add('light-theme');
-      } else {
-        document.documentElement.classList.remove('light-theme');
+      } else if (currentTheme === 'sunset') {
+        document.documentElement.classList.add('sunset-theme');
       }
       updateThemeIcons();
 
       // Language setup
-      const currentLang = localStorage.getItem('lang') || 'id';
+      const currentLang = localStorage.getItem('lang') || 'en';
       changeLanguage(currentLang);
 
       // Sidebar state restore

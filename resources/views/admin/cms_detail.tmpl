@@ -1,13 +1,14 @@
 {{ define "admin/cms_detail.tmpl" }}
 {{ template "layouts/app_header" . }}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
       <!-- Top header -->
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
         <div>
           <div style="display: flex; align-items: center; gap: 0.75rem;">
             <a href="/admin/cms" style="color: var(--text-secondary); font-size: 1.25rem;"><i class="fa-solid fa-arrow-left-long"></i></a>
-            <h1 style="font-size: 2rem;">Manajemen Konten: {{ .Page.Name }}</h1>
+            <h1 style="font-size: 2rem;"><span data-translate="cms_detail_title">Manajemen Konten</span>: {{ .Page.Name }}</h1>
           </div>
-          <p style="color: var(--text-secondary); margin-top: 0.35rem;">Mengedit isi teks, terjemahan, slogan, dan informasi yang terdaftar pada halaman <strong>{{ .Page.Name }}</strong>.</p>
+          <p style="color: var(--text-secondary); margin-top: 0.35rem;"><span data-translate="cms_detail_desc">Mengedit isi teks, terjemahan, slogan, dan informasi yang terdaftar pada halaman</span> <strong>{{ .Page.Name }}</strong>.</p>
         </div>
         <div style="color: var(--text-secondary); font-size: 0.9rem; text-transform: uppercase; font-family: var(--font-mono);">
           Type: <span style="color: var(--accent-secondary); font-weight: bold;">{{ .Page.Type }}</span>
@@ -16,67 +17,353 @@
 
       <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: start;">
         
-        <!-- Contents Form -->
-        <div class="card" style="border-color: var(--border-color); background: var(--bg-secondary); padding: 2.5rem;">
-          <h3 style="font-size: 1.25rem; margin-bottom: 2rem;"><i class="fa-solid fa-file-invoice" style="margin-right: 0.5rem; color: var(--accent-primary);"></i> Daftar Terjemahan Konten</h3>
+        <!-- Contents Form Area (Outer Container instead of single card) -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
           
-          {{ if .Contents }}
-            <form action="/admin/cms/pages/{{ .Page.ID }}/contents" method="POST">
-              {{ range .Contents }}
-                <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
-                  <div style="font-weight: 700; color: #fff; font-size: 1rem; margin-bottom: 0.75rem; font-family: var(--font-mono); text-transform: uppercase; display: flex; justify-content: space-between;">
-                    <span>Key: <span style="color: var(--accent-secondary);">{{ .Key }}</span></span>
-                  </div>
+          {{ if .GroupedContents }}
+            {{ range $section := .SectionsOrder }}
+              {{ $items := index $.GroupedContents $section }}
+              <form action="/admin/cms/pages/{{ $.Page.ID }}/contents" method="POST" style="margin-bottom: 2rem;">
+                <div class="card" style="border-color: var(--border-color); background: var(--bg-secondary); padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                  <h3 style="font-size: 1.15rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; color: var(--accent-secondary); display: flex; justify-content: space-between; align-items: center; font-weight: 700;">
+                    <span><i class="fa-solid fa-folder-open"></i> {{ $section }}</span>
+                    <button type="button" class="btn btn-primary btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.72rem; gap: 0.2rem;" onclick="openAddKeyWithSection('{{ $section }}')">
+                      <i class="fa-solid fa-plus-circle"></i> <span data-translate="btn_add_key">Tambah Key</span>
+                    </button>
+                  </h3>
                   
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                    <div class="form-group">
-                      <label class="form-label" style="font-size: 0.8rem; color: var(--text-secondary);">Bahasa Indonesia (ID)</label>
-                      <textarea name="{{ .Key }}_id" class="form-control" rows="2" required>{{ .ValueId }}</textarea>
+                  {{ range $items }}
+                    <div class="content-key-block" style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px dashed rgba(255,255,255,0.05);">
+                      <div style="font-weight: 600; color: #fff; font-size: 0.85rem; margin-bottom: 0.75rem; font-family: var(--font-mono); text-transform: uppercase; display: flex; justify-content: space-between; align-items: center;">
+                        <span class="key-badge-container" data-key="{{ .Key }}" data-style="{{ .Style }}">Key: <span style="color: var(--accent-primary);">{{ .Key }}</span></span>
+                        <button type="button" class="btn btn-danger btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; gap: 0.25rem;" onclick="removeContentKeyFromUI(this, '{{ .ID }}')">
+                          <i class="fa-solid fa-trash"></i> <span data-translate="btn_delete_key">Hapus Key</span>
+                        </button>
+                      </div>
+                      
+                      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                          <label class="form-label" style="font-size: 0.78rem; color: var(--text-secondary);" data-translate="content_id">Bahasa Indonesia (ID)</label>
+                          <textarea name="{{ .Key }}_id" class="form-control" rows="2" required>{{ .ValueId }}</textarea>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                          <label class="form-label" style="font-size: 0.78rem; color: var(--text-secondary);" data-translate="content_en">English (EN)</label>
+                          <textarea name="{{ .Key }}_en" class="form-control" rows="2" required>{{ .ValueEn }}</textarea>
+                        </div>
+                      </div>
                     </div>
-                    <div class="form-group">
-                      <label class="form-label" style="font-size: 0.8rem; color: var(--text-secondary);">English (EN)</label>
-                      <textarea name="{{ .Key }}_en" class="form-control" rows="2" required>{{ .ValueEn }}</textarea>
-                    </div>
+                  {{ end }}
+                  
+                  <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+                    <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.5rem; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 0.5rem;">
+                      <i class="fa-solid fa-save"></i> <span data-translate="btn_save_section">Simpan Seksi Ini</span>
+                    </button>
                   </div>
                 </div>
-              {{ end }}
-              
-              <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 1rem;">
-                <i class="fa-solid fa-save"></i> Simpan Semua Konten Halaman
-              </button>
-            </form>
+              </form>
+            {{ end }}
           {{ else }}
-            <div style="padding: 3rem; text-align: center; color: var(--text-secondary);">
+            <div class="card" style="border-color: var(--border-color); background: var(--bg-secondary); padding: 3rem; text-align: center; color: var(--text-secondary);">
               <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
               <p>Belum ada isi konten terdaftar untuk halaman ini.</p>
+            </div>
+          {{ end }}
+
+          {{ if eq .Page.Type "products" }}
+            <div class="card" style="border-color: var(--border-color); background: var(--bg-secondary); padding: 2.5rem; margin-bottom: 2rem;">
+              <h3 style="font-size: 1.25rem; margin-bottom: 2rem;"><i class="fa-solid fa-tags" style="margin-right: 0.5rem; color: var(--accent-secondary);"></i> <span data-translate="price_settings">Pengaturan Harga & Diskon Paket</span></h3>
+              <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                {{ range .Products }}
+                  <div class="card" style="background: rgba(255,255,255,0.02); padding: 1.5rem; border: 1px solid var(--border-color); margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                      <span style="font-weight: bold; color: #fff; font-size: 1.05rem;">{{ .Name }}</span>
+                      <span style="color: var(--text-secondary); font-size: 0.85rem; font-family: var(--font-mono);">ID: {{ .ID }}</span>
+                    </div>
+                     <form action="/admin/cms/products/{{ .ID }}/price" method="POST" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem; align-items: flex-end;" class="product-price-form">
+                      <input type="hidden" name="original_price" class="raw-price-input" value="{{ printf "%.0f" .OriginalPrice }}">
+                      <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label admin-price-label" style="font-size: 0.8rem; color: var(--text-secondary);">Harga Asli (Rupiah)</label>
+                        <input type="text" class="form-control formatted-price-input" placeholder="e.g. 1.000.000" required>
+                      </div>
+                      <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" style="font-size: 0.8rem; color: var(--text-secondary);" data-translate="discount_percent">Diskon (%)</label>
+                        <input type="number" step="0.01" name="discount" class="form-control discount-input" value="{{ printf "%.2f" .Discount }}" placeholder="e.g. 50" required>
+                      </div>
+                      <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem; font-size: 0.9rem; gap: 0.5rem; height: 42px;">
+                        <i class="fa-solid fa-save"></i> <span data-translate="btn_save">Simpan</span>
+                      </button>
+                    </form>
+                    <div style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-secondary);">
+                      <span data-translate="price_after_discount">Harga Setelah Diskon (Otomatis)</span>: <strong class="admin-price-preview" data-discount="{{ printf "%.2f" .Discount }}" style="color: var(--accent-secondary);">Rp 0</strong>
+                    </div>
+                  </div>
+                {{ end }}
+              </div>
             </div>
           {{ end }}
         </div>
 
         <!-- Add Content Key Sidebar Card -->
         <div class="card" style="border-color: var(--border-color); background: var(--bg-secondary); padding: 2rem;">
-          <h3 style="font-size: 1.2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-plus-circle" style="margin-right: 0.5rem; color: var(--accent-primary);"></i> Tambah Key Baru</h3>
-          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">Tambahkan kunci terjemahan baru yang akan dimuat dinamis pada halaman guest.</p>
+          <h3 style="font-size: 1.2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-plus-circle" style="margin-right: 0.5rem; color: var(--accent-primary);"></i> <span data-translate="add_new_key">Tambah Key Baru</span></h3>
+          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;" data-translate="add_key_desc">Tambahkan kunci terjemahan baru yang akan dimuat dinamis pada halaman guest.</p>
           
           <form action="/admin/cms/pages/{{ .Page.ID }}/contents/create" method="POST">
             <div class="form-group" style="margin-bottom: 1rem;">
-              <label class="form-label" style="font-size: 0.8rem;">Kunci Konten (Key)</label>
+              <label class="form-label" style="font-size: 0.8rem;" data-translate="category_section">Kategori / Seksi (Section)</label>
+              <input type="text" name="section" id="addKeySectionInput" class="form-control" placeholder="e.g. Hero Banner" list="sectionsDatalist" required>
+              <datalist id="sectionsDatalist">
+                {{ range $section := .SectionsOrder }}
+                  <option value="{{ $section }}"></option>
+                {{ end }}
+              </datalist>
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label class="form-label" style="font-size: 0.8rem;" data-translate="style_type">Gaya / Jenis Konten (Style)</label>
+              <select name="style" class="form-control" required style="background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary);">
+                <option value="general" data-translate="style_general">Umum / Text Biasa</option>
+                <option value="title" data-translate="style_title">Judul / Title</option>
+                <option value="text" data-translate="style_text">Deskripsi / Detail Text</option>
+                <option value="button" data-translate="style_button">Tombol / Button</option>
+                <option value="feature" data-translate="style_feature">Fitur / List Item</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label class="form-label" style="font-size: 0.8rem;" data-translate="content_key">Kunci Konten (Key)</label>
               <input type="text" name="key" class="form-control" placeholder="e.g. hero_new_title" required>
             </div>
             <div class="form-group" style="margin-bottom: 1rem;">
-              <label class="form-label" style="font-size: 0.8rem;">Konten ID (Indonesian)</label>
-              <textarea name="value_id" class="form-control" rows="2" placeholder="Teks Terjemahan Indonesia" required></textarea>
+              <label class="form-label" style="font-size: 0.8rem;" data-translate="content_id">Konten ID (Indonesian)</label>
+              <textarea name="value_id" class="form-control" rows="2" placeholder="Teks Terjemahan Indonesia" data-translate="placeholder_value_id" required></textarea>
             </div>
             <div class="form-group" style="margin-bottom: 1.5rem;">
-              <label class="form-label" style="font-size: 0.8rem;">Konten EN (English)</label>
-              <textarea name="value_en" class="form-control" rows="2" placeholder="Teks Terjemahan Inggris" required></textarea>
+              <label class="form-label" style="font-size: 0.8rem;" data-translate="content_en">Konten EN (English)</label>
+              <textarea name="value_en" class="form-control" rows="2" placeholder="Teks Terjemahan Inggris" data-translate="placeholder_value_en" required></textarea>
             </div>
             <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
-              <i class="fa-solid fa-plus"></i> Tambah Key
+              <i class="fa-solid fa-plus"></i> <span data-translate="btn_add_key">Tambah Key</span>
             </button>
           </form>
         </div>
 
       </div>
+
+  <script>
+    function openAddKeyWithSection(section) {
+      const sectionInput = document.getElementById('addKeySectionInput');
+      if (sectionInput) {
+        sectionInput.value = section;
+        sectionInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        sectionInput.focus();
+      }
+    }
+
+    // AJAX form submissions with SweetAlert2
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        Swal.fire({
+          title: 'Menyimpan...',
+          text: 'Mohon tunggu sebentar',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        const formData = new FormData(form);
+        const searchParams = new URLSearchParams(formData);
+        fetch(form.action || window.location.href, {
+          method: form.method || 'POST',
+          body: searchParams,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Gagal menyimpan');
+          }
+          return response.text();
+        })
+        .then(data => {
+          Swal.fire({
+            title: 'Berhasil!',
+            text: 'Perubahan telah disimpan.',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          }).then(() => {
+            window.location.href = '/admin/cms';
+          });
+        })
+        .catch(error => {
+          Swal.fire({
+            title: 'Gagal!',
+            text: 'Terjadi kesalahan saat menyimpan data.',
+            icon: 'error'
+          });
+        });
+      });
+    });
+
+    // Remove key from UI on delete click (deferred delete on save)
+    function removeContentKeyFromUI(btn, id) {
+      Swal.fire({
+        title: 'Hapus Key?',
+        text: 'Key ini akan disembunyikan dan dihapus secara permanen saat Anda menekan tombol Simpan Seksi Ini.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const block = btn.closest('.content-key-block');
+          if (block) {
+            const form = block.closest('form');
+            let deletedInput = form.querySelector('.deleted-keys-input');
+            if (!deletedInput) {
+              deletedInput = document.createElement('input');
+              deletedInput.type = 'hidden';
+              deletedInput.name = 'deleted_keys';
+              deletedInput.className = 'deleted-keys-input';
+              deletedInput.value = '';
+              form.appendChild(deletedInput);
+            }
+            
+            if (deletedInput.value) {
+              deletedInput.value += ',' + id;
+            } else {
+              deletedInput.value = id;
+            }
+            
+            block.remove();
+          }
+        }
+      });
+    }
+
+    // Dynamic key badges based on style metadata or key fallback
+    document.addEventListener("DOMContentLoaded", () => {
+      const lang = localStorage.getItem('lang') || 'en';
+      document.querySelectorAll('.key-badge-container').forEach(container => {
+        const key = container.getAttribute('data-key').toLowerCase();
+        const style = container.getAttribute('data-style') || 'general';
+        
+        let badgeText = 'Konten / Text';
+        let badgeColor = 'rgba(255, 255, 255, 0.05)';
+        let textColor = '#bbb';
+
+        if (style === 'button' || key.includes('btn_') || key.includes('_btn') || key.includes('button')) {
+          badgeText = 'Tombol / Button';
+          badgeColor = 'rgba(0, 150, 255, 0.15)';
+          textColor = '#39a9ff';
+        } else if (style === 'title' || key.includes('title') || key.includes('slogan') || key.includes('name')) {
+          badgeText = 'Judul / Title';
+          badgeColor = 'rgba(180, 80, 255, 0.15)';
+          textColor = '#c285ff';
+        } else if (style === 'text' || key.includes('desc') || key.includes('copy') || key.includes('description')) {
+          badgeText = 'Deskripsi / Detail';
+          badgeColor = 'rgba(40, 210, 100, 0.15)';
+          textColor = '#47d878';
+        } else if (style === 'feature' || key.includes('feature_') || key.includes('_feature') || key.includes('features')) {
+          badgeText = 'Fitur / List';
+          badgeColor = 'rgba(255, 140, 0, 0.15)';
+          textColor = '#ff9c33';
+        }
+
+        const badge = document.createElement('span');
+        badge.textContent = badgeText;
+        badge.style.padding = '0.2rem 0.5rem';
+        badge.style.borderRadius = '4px';
+        badge.style.fontSize = '0.68rem';
+        badge.style.fontWeight = 'bold';
+        badge.style.marginLeft = '0.75rem';
+        badge.style.background = badgeColor;
+        badge.style.color = textColor;
+        badge.style.border = `1px solid ${textColor}30`;
+        badge.style.textTransform = 'uppercase';
+        badge.style.letterSpacing = '0.03em';
+        
+        container.appendChild(badge);
+      });
+
+      // Update labels of price input
+      document.querySelectorAll('.admin-price-label').forEach(el => {
+        el.textContent = lang === 'en' ? 'Original Price (USD)' : 'Harga Asli (Rupiah)';
+      });
+
+      // Update inputs and preview values on load
+      document.querySelectorAll('.product-price-form').forEach(form => {
+        const rawPriceInput = form.querySelector('.raw-price-input');
+        const formattedPriceInput = form.querySelector('.formatted-price-input');
+        const discountInput = form.querySelector('.discount-input');
+        const card = form.closest('.card');
+        const previewEl = card.querySelector('.admin-price-preview');
+
+        let rawVal = parseFloat(rawPriceInput.value) || 0;
+
+        // Set initial formatted input value
+        if (lang === 'en') {
+          let usd = Math.round(rawVal / 15000);
+          formattedPriceInput.value = new Intl.NumberFormat('en-US').format(usd);
+        } else {
+          formattedPriceInput.value = new Intl.NumberFormat('id-ID').format(rawVal);
+        }
+
+        // Function to recalculate automatically
+        function recalculate() {
+          let currentRawVal = 0;
+          let typedVal = formattedPriceInput.value.replace(/[^0-9]/g, '');
+          let num = parseFloat(typedVal) || 0;
+
+          if (lang === 'en') {
+            currentRawVal = num * 15000;
+          } else {
+            currentRawVal = num;
+          }
+
+          rawPriceInput.value = currentRawVal;
+
+          let discount = parseFloat(discountInput.value) || 0;
+          let discountedRaw = currentRawVal * (1 - discount / 100);
+
+          if (lang === 'en') {
+            let usdDiscounted = Math.round(discountedRaw / 15000);
+            previewEl.textContent = '$' + new Intl.NumberFormat('en-US').format(usdDiscounted);
+          } else {
+            previewEl.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(discountedRaw);
+          }
+        }
+
+        // Format on input
+        formattedPriceInput.addEventListener('input', (e) => {
+          let cursorPosition = e.target.selectionStart;
+          let originalLength = e.target.value.length;
+          
+          let cleanVal = e.target.value.replace(/[^0-9]/g, '');
+          if (cleanVal) {
+            let formatted = new Intl.NumberFormat(lang === 'en' ? 'en-US' : 'id-ID').format(parseInt(cleanVal));
+            e.target.value = formatted;
+            
+            // Adjust cursor position
+            let newLength = formatted.length;
+            e.target.setSelectionRange(cursorPosition + (newLength - originalLength), cursorPosition + (newLength - originalLength));
+          } else {
+            e.target.value = '';
+          }
+          recalculate();
+        });
+
+        discountInput.addEventListener('input', recalculate);
+
+        // Run once initially
+        recalculate();
+      });
+    });
+  </script>
 {{ template "layouts/app_footer" . }}
 {{ end }}

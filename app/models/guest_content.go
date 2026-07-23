@@ -10,4 +10,6 @@ type GuestContent struct {
 	Key     string `gorm:"column:key;uniqueIndex"`
 	ValueId string `gorm:"column:value_id"`
 	ValueEn string `gorm:"column:value_en"`
+	Section string `gorm:"column:section"`
+	Style   string `gorm:"column:style"`
 }

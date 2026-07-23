@@ -6,13 +6,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IMS - Turning Ideas Into Digital Solutions</title>
-  <link rel="stylesheet" href="/public/css/style.css?v=100">
+  <link rel="icon" type="image/png" href="/public/img/logo_ims.png?v=2">
+  <link rel="stylesheet" href="/public/css/style.css?v=101">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>
     // Initialize Theme immediately to prevent flash
     const savedTheme = localStorage.getItem('theme') || 'dark';
     if (savedTheme === 'light') {
       document.documentElement.classList.add('light-theme');
+    } else if (savedTheme === 'sunset') {
+      document.documentElement.classList.add('sunset-theme');
     }
 
     // Dynamic Navigation Active Link Highlight
@@ -35,6 +38,9 @@
   <!-- Futuristic Dynamic Dot Matrix Wave Background -->
   <div class="futuristic-dot-grid"></div>
 
+  <!-- Sunset Theme Sun Graphic -->
+  <div class="sunset-sun"></div>
+
   <!-- Futuristic Glowing Particles Background -->
   <div class="futuristic-bubble-1"></div>
   <div class="futuristic-bubble-2"></div>
@@ -44,7 +50,7 @@
   <!-- Navbar -->
   <header class="navbar">
     <a href="/" class="logo">
-      <img src="/public/img/logo_ims.png" alt="IMS Logo" onerror="this.style.display='none';">
+      <img src="/public/img/logo_ims.png" alt="IMS Logo">
       <span>IMS</span>
     </a>
 
@@ -72,7 +78,8 @@
     <div class="interface-controls">
       <button class="btn-icon" id="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
         <i class="fa-solid fa-sun" style="display:none;" id="sun-icon"></i>
-        <i class="fa-solid fa-moon" id="moon-icon"></i>
+        <i class="fa-solid fa-moon" style="display:none;" id="moon-icon"></i>
+        <i class="fa-solid fa-mountain-sun" style="display:none;" id="sunset-icon"></i>
       </button>
       <select class="select-lang" id="lang-select" onchange="changeLanguage(this.value)" title="Change Language">
         <option value="id">ID</option>
@@ -227,17 +234,54 @@
         products_title: "Pilih Paket Pengembangan Anda",
         products_desc: "Harga jujur dan transparan. Pilih paket yang sesuai dengan skala bisnis Anda saat ini, dan kami akan membangunnya dengan sempurna.",
         products_whats_included: "Yang Termasuk",
-        products_btn_order: "Pesan Sekarang",
-        products_btn_discuss: "Hubungi Kami",
+        product_btn_1: "Pesan Sekarang",
+        product_btn_2: "Pesan Sekarang",
+        product_btn_3: "Hubungi Kami",
         product_price_negotiable: "Hubungi Kami",
-
         // Product Details
         product_name_1: "Paket Web Standar",
         product_name_2: "Paket Bisnis Premium",
         product_name_3: "Cetak Biru Portal & Solusi Enterprise Kustom",
         product_desc_1: "Sempurna untuk profil bisnis kecil, portofolio, dan landing page.",
         product_desc_2: "Website profesional dengan CMS admin panel khusus, blog, dan fungsionalitas dinamis.",
-        product_desc_3: "Platform kustom berskala besar, integrasi API, orkestrasi cloud, dan solusi enterprise yang disesuaikan."
+        product_desc_3: "Platform kustom berskala besar, integrasi API, orkestrasi cloud, dan solusi enterprise yang disesuaikan.",
+        discount_pill_1: "HEMAT 50%",
+        discount_pill_2: "HEMAT 44%",
+        chat_ai_assistant: "Asisten AI",
+        chat_with_admin: "Hubungi Admin",
+        chat_greeting: "Halo! Saya asisten digital IMS. Pilih topik di bawah atau ketik pertanyaan Anda!",
+        chat_faq_packages: "📦 Paket & Harga",
+        chat_faq_services: "🛠️ Layanan",
+        chat_faq_contact: "📞 Kontak",
+        chat_placeholder_ai: "Tanya AI...",
+        chat_placeholder_admin: "Pesan ke admin...",
+        chat_support_desc: "Ketik nama dan email Anda untuk memulai sesi obrolan langsung dengan tim kami.",
+        chat_support_name: "Nama Anda",
+        chat_support_email: "Email Anda",
+        chat_support_start: "Mulai Obrolan",
+
+        // Feature Translations (ID)
+        feature_standard_1: "Desain Halaman Tunggal Kustom (Landing Page / One-Page Website)",
+        feature_standard_2: "Tampilan Responsif & Estetika Premium",
+        feature_standard_3: "Integrasi Formulir Kontak",
+        feature_standard_4: "Optimasi SEO Dasar",
+        feature_standard_5: "Dukungan Gratis 1 Bulan",
+        
+        feature_premium_1: "5 Halaman Utama Kustom (Beranda, Profil, Layanan, Kontak, Blog)",
+        feature_premium_2: "Postingan/Produk Tidak Terbatas (Melalui CMS Panel)",
+        feature_premium_3: "CMS Admin Panel untuk Mengelola Konten",
+        feature_premium_4: "Integrasi Google Maps & Google Analytics",
+        feature_premium_5: "Pembagian Peran Pengguna (Admin/Staff/Customer)",
+        feature_premium_6: "Dukungan Premium 3 Bulan",
+        feature_premium_7: "Optimasi SEO & Kecepatan Website",
+        
+        feature_custom_1: "Arsitektur Kustom Modern (React/Vue + Go/Node/Laravel)",
+        feature_custom_2: "Pengembangan & Integrasi API Kustom",
+        feature_custom_3: "Penyebaran Cloud Mandiri (AWS/GCP/Cloudflare)",
+        feature_custom_4: "Skalabilitas Tinggi & Keamanan Kriptografi",
+        feature_custom_5: "Dukungan SLA Premium 6 Bulan",
+        feature_custom_6: "Pembagian Peran Pengguna Kustom (Admin/Staff/Client)",
+        feature_custom_7: "Jumlah Halaman / Produk Dinamis Tanpa Batas"
       },
       en: {
         nav_home: "Home",
@@ -334,17 +378,54 @@
         products_title: "Choose Your Development Package",
         products_desc: "Honest, transparent pricing. Pick a plan fitting your current business scale, and we will build it to perfection.",
         products_whats_included: "What's Included",
-        products_btn_order: "Order Now",
-        products_btn_discuss: "Get In Touch",
+        product_btn_1: "Order Now",
+        product_btn_2: "Order Now",
+        product_btn_3: "Get In Touch",
         product_price_negotiable: "Contact Us",
-
         // Product Details
         product_name_1: "Standard Web Package",
         product_name_2: "Premium Business Package",
         product_name_3: "Corporate Portal Blueprint & Custom Enterprise Solution",
         product_desc_1: "Perfect for small business profiles, portfolios, and landing pages.",
         product_desc_2: "Professional website with dedicated CMS admin panel, blog, and dynamic features.",
-        product_desc_3: "Large-scale custom platform, API integrations, cloud orchestration, and tailored enterprise solutions."
+        product_desc_3: "Large-scale custom platform, API integrations, cloud orchestration, and tailored enterprise solutions.",
+
+        // Feature Translations (EN)
+        feature_standard_1: "Custom Single-Page Design (Landing Page / One-Page Website)",
+        feature_standard_2: "Responsive Layout & Premium Aesthetics",
+        feature_standard_3: "Contact Form Integration",
+        feature_standard_4: "Basic SEO Optimization",
+        feature_standard_5: "1-Month Free Support",
+        
+        feature_premium_1: "5 Custom Main Pages (Home, Profile, Services, Contact, Blog)",
+        feature_premium_2: "Unlimited Posts/Products (Via CMS Panel)",
+        feature_premium_3: "CMS Admin Panel for Content Management",
+        feature_premium_4: "Google Maps & Google Analytics Integration",
+        feature_premium_5: "User Role Division (Admin/Staff/Customer)",
+        feature_premium_6: "3-Month Premium Support",
+        feature_premium_7: "SEO & Website Speed Optimization",
+        
+        feature_custom_1: "Modern Custom Architecture (React/Vue + Go/Node/Laravel)",
+        feature_custom_2: "Custom API Development & Integration",
+        feature_custom_3: "Self-Managed Cloud Deployment (AWS/GCP/Cloudflare)",
+        feature_custom_4: "High Scalability & Cryptographic Security",
+        feature_custom_5: "6-Month Premium SLA Support",
+        feature_custom_6: "Custom User Role Division (Admin/Staff/Client)",
+        feature_custom_7: "Unlimited Dynamic Pages / Products",
+        discount_pill_1: "SAVE 50%",
+        discount_pill_2: "SAVE 44%",
+        chat_ai_assistant: "AI Assistant",
+        chat_with_admin: "Chat with Admin",
+        chat_greeting: "Hello! I am your IMS digital assistant. Select a topic or type your query below!",
+        chat_faq_packages: "📦 Pricing Packages",
+        chat_faq_services: "🛠️ Services",
+        chat_faq_contact: "📞 Contact Info",
+        chat_placeholder_ai: "Ask AI...",
+        chat_placeholder_admin: "Message admin...",
+        chat_support_desc: "Type your name and email to start a direct support session with our team.",
+        chat_support_name: "Your Name",
+        chat_support_email: "Your Email",
+        chat_support_start: "Start Live Chat"
       }
     };
 
@@ -354,37 +435,84 @@
     if (idEl && idEl.textContent) {
       try {
         const dbTranslationsID = JSON.parse(idEl.textContent);
-        Object.assign(translations.id, dbTranslationsID);
+        if (Object.keys(dbTranslationsID).length > 0) {
+          // Clear keys not present in database
+          for (const key in translations.id) {
+            if (!(key in dbTranslationsID)) {
+              translations.id[key] = "";
+            }
+          }
+          Object.assign(translations.id, dbTranslationsID);
+        }
       } catch(e){}
     }
     if (enEl && enEl.textContent) {
       try {
         const dbTranslationsEN = JSON.parse(enEl.textContent);
-        Object.assign(translations.en, dbTranslationsEN);
+        if (Object.keys(dbTranslationsEN).length > 0) {
+          // Clear keys not present in database
+          for (const key in translations.en) {
+            if (!(key in dbTranslationsEN)) {
+              translations.en[key] = "";
+            }
+          }
+          Object.assign(translations.en, dbTranslationsEN);
+        }
       } catch(e){}
     }
 
-    // Dark/Light Theme Switching
-    const themeToggle = document.getElementById('theme-toggle');
-    const sunIcon = document.getElementById('sun-icon');
-    const moonIcon = document.getElementById('moon-icon');
+    // Theme Switching (Dark -> Light -> Sunset)
+    const sunIcons = document.querySelectorAll('#sun-icon');
+    const moonIcons = document.querySelectorAll('#moon-icon');
+    const sunsetIcons = document.querySelectorAll('#sunset-icon');
 
     function toggleTheme() {
-      const isLight = document.documentElement.classList.toggle('light-theme');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      let currentTheme = 'dark';
+      if (document.documentElement.classList.contains('light-theme')) {
+        currentTheme = 'light';
+      } else if (document.documentElement.classList.contains('sunset-theme')) {
+        currentTheme = 'sunset';
+      }
+
+      document.documentElement.classList.remove('light-theme', 'sunset-theme');
+
+      let nextTheme = 'dark';
+      if (currentTheme === 'dark') {
+        nextTheme = 'light';
+        document.documentElement.classList.add('light-theme');
+      } else if (currentTheme === 'light') {
+        nextTheme = 'sunset';
+        document.documentElement.classList.add('sunset-theme');
+      } else {
+        nextTheme = 'dark';
+      }
+
+      localStorage.setItem('theme', nextTheme);
       updateThemeIcons();
     }
 
     function updateThemeIcons() {
-      const isLight = document.documentElement.classList.contains('light-theme');
-      if (sunIcon && moonIcon) {
-        if (isLight) {
-          sunIcon.style.display = 'block';
-          moonIcon.style.display = 'none';
-        } else {
-          sunIcon.style.display = 'none';
-          moonIcon.style.display = 'block';
-        }
+      let theme = 'dark';
+      if (document.documentElement.classList.contains('light-theme')) {
+        theme = 'light';
+      } else if (document.documentElement.classList.contains('sunset-theme')) {
+        theme = 'sunset';
+      }
+
+      const sunIcons = document.querySelectorAll('#sun-icon');
+      const moonIcons = document.querySelectorAll('#moon-icon');
+      const sunsetIcons = document.querySelectorAll('#sunset-icon');
+
+      sunIcons.forEach(el => el.style.display = 'none');
+      moonIcons.forEach(el => el.style.display = 'none');
+      sunsetIcons.forEach(el => el.style.display = 'none');
+
+      if (theme === 'light') {
+        sunIcons.forEach(el => el.style.display = 'inline-block');
+      } else if (theme === 'sunset') {
+        sunsetIcons.forEach(el => el.style.display = 'inline-block');
+      } else {
+        moonIcons.forEach(el => el.style.display = 'inline-block');
       }
     }
 
@@ -396,18 +524,34 @@
       applyTranslations(lang);
       if (langSelect) langSelect.value = lang;
     }
+    window.changeLanguage = changeLanguage;
 
     function applyTranslations(lang) {
-      const dict = translations[lang] || translations['id'];
+      const dict = translations[lang] || translations['en'];
+      
+      // Translate standard data-translate elements
       document.querySelectorAll('[data-translate]').forEach(el => {
         const key = el.getAttribute('data-translate');
         if (dict[key]) {
           if (key === 'hi_user') {
             const username = el.getAttribute('data-username') || '';
             el.innerHTML = '<i class="fa-solid fa-user"></i> ' + dict[key] + username;
+          } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            el.setAttribute('placeholder', dict[key]);
           } else {
             el.textContent = dict[key];
           }
+        }
+      });
+
+      // Translate dynamic value elements (e.g. features list)
+      document.querySelectorAll('[data-translate-val]').forEach(el => {
+        const text = el.getAttribute('data-translate-val').trim();
+        const key = Object.keys(translations.id).find(k => translations.id[k] === text);
+        if (key && dict[key]) {
+          el.textContent = dict[key];
+        } else {
+          el.textContent = text;
         }
       });
     }
@@ -418,8 +562,8 @@
       updateThemeIcons();
 
       // Sync Lang state
-      const savedLang = localStorage.getItem('lang') || 'id';
-      changeLanguage(savedLang);
+      const savedLang = localStorage.getItem('lang') || 'en';
+      window.changeLanguage(savedLang);
 
       // Scroll Reveal Observer
       const scrollObserver = new IntersectionObserver((entries) => {
@@ -436,6 +580,512 @@
         scrollObserver.observe(el);
       });
     });
+  </script>
+
+  <!-- Chatbot Styles -->
+  <style>
+    .chatbot-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 10000;
+      font-family: inherit;
+    }
+    .chatbot-trigger {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .chatbot-trigger:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 6px 25px rgba(37, 99, 235, 0.5);
+    }
+    .chatbot-window {
+      position: absolute;
+      bottom: 80px;
+      right: 0;
+      width: 360px;
+      height: 500px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      backdrop-filter: blur(10px);
+    }
+    .chatbot-window.open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .chatbot-header {
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      color: #fff;
+      padding: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .chatbot-header-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+    .chatbot-close-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.25rem;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+    .chatbot-close-btn:hover {
+      opacity: 1;
+    }
+    .chatbot-modes {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(255,255,255,0.01);
+    }
+    .chatbot-mode-btn {
+      flex: 1;
+      padding: 0.75rem;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.9rem;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .chatbot-mode-btn.active {
+      color: var(--accent-primary);
+      border-bottom-color: var(--accent-primary);
+      background: rgba(37,99,235,0.04);
+    }
+    .chatbot-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .chatbot-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .chat-bubble {
+      max-width: 80%;
+      padding: 0.65rem 0.85rem;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    .chat-bubble.assistant {
+      align-self: flex-start;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border-bottom-left-radius: 2px;
+      border: 1px solid var(--border-color);
+    }
+    .chat-bubble.user {
+      align-self: flex-end;
+      background: var(--accent-primary);
+      color: #fff;
+      border-bottom-right-radius: 2px;
+    }
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.2rem 0.4rem;
+    }
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--text-secondary);
+      border-radius: 50%;
+      animation: typing-bounce 1.4s infinite ease-in-out both;
+    }
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes typing-bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1.0); }
+    }
+    .chatbot-faq-list {
+      padding: 0.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      border-top: 1px solid var(--border-color);
+      background: rgba(255,255,255,0.01);
+    }
+    .chatbot-faq-btn {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.45rem 0.75rem;
+      text-align: left;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chatbot-faq-btn:hover {
+      background: rgba(37,99,235,0.08);
+      border-color: var(--accent-primary);
+    }
+    .chatbot-input-area {
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 0.5rem;
+      background: var(--bg-secondary);
+    }
+    .chatbot-input-area input {
+      flex: 1;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      color: var(--text-primary);
+      outline: none;
+      font-size: 0.88rem;
+    }
+    .chatbot-input-area button {
+      background: var(--accent-primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .chatbot-input-area button:hover {
+      background: var(--accent-secondary);
+    }
+  </style>
+
+  <!-- Floating Chatbot Widget HTML -->
+  <div class="chatbot-container">
+    <button class="chatbot-trigger" id="chatbot-trigger" onclick="toggleChatbot()" title="Chat with us">
+      <i class="fa-solid fa-comments"></i>
+    </button>
+
+    <div class="chatbot-window" id="chatbot-window">
+      <div class="chatbot-header">
+        <div class="chatbot-header-title">
+          <i class="fa-solid fa-robot"></i>
+          <span>IMS Digital Assistant</span>
+        </div>
+        <button class="chatbot-close-btn" onclick="toggleChatbot()">&times;</button>
+      </div>
+
+      <div class="chatbot-modes">
+        <button class="chatbot-mode-btn active" id="mode-btn-ai" onclick="setChatMode('ai')" data-translate="chat_ai_assistant">AI Assistant</button>
+        <button class="chatbot-mode-btn" id="mode-btn-support" onclick="setChatMode('support')" data-translate="chat_with_admin">Chat with Admin</button>
+      </div>
+
+      <!-- AI View -->
+      <div class="chatbot-view" id="chatbot-view-ai">
+        <div class="chatbot-messages" id="ai-messages">
+          <div class="chat-bubble assistant" data-translate="chat_greeting">Hello! I am your IMS digital assistant. Select a topic or type your query below!</div>
+        </div>
+        <div class="chatbot-faq-list">
+          <button class="chatbot-faq-btn" onclick="askFAQ('What are the packages?')" data-translate="chat_faq_packages">📦 Pricing Packages</button>
+          <button class="chatbot-faq-btn" onclick="askFAQ('What services do you offer?')" data-translate="chat_faq_services">🛠️ Services</button>
+          <button class="chatbot-faq-btn" onclick="askFAQ('How do I contact you?')" data-translate="chat_faq_contact">📞 Contact Info</button>
+        </div>
+        <div class="chatbot-input-area">
+          <input type="text" id="ai-input" placeholder="Ask AI..." onkeypress="handleChatKey(event, 'ai')" data-translate="chat_placeholder_ai">
+          <button onclick="sendChatMessage('ai')"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+
+      <!-- Support Chat View -->
+      <div class="chatbot-view" id="chatbot-view-support" style="display: none;">
+        <!-- Init/Register Support Chat -->
+        <div id="support-init-form" style="padding: 1.5rem 1.2rem; display: flex; flex-direction: column; gap: 0.75rem;">
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 0.5rem 0;" data-translate="chat_support_desc">Type your name and email to start a direct support session with our team.</p>
+          <input type="text" id="support-name" placeholder="Your Name" style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:8px; padding:0.6rem 1rem; color:var(--text-primary); outline:none;" data-translate="chat_support_name">
+          <input type="email" id="support-email" placeholder="Your Email" style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:8px; padding:0.6rem 1rem; color:var(--text-primary); outline:none;" data-translate="chat_support_email">
+          <button class="btn btn-primary" onclick="initSupportSession()" style="width: 100%; padding:0.65rem;" data-translate="chat_support_start">Start Live Chat</button>
+        </div>
+
+        <!-- Support Live Messages -->
+        <div id="support-chat-area" style="display: none; height: 100%; flex-direction: column; overflow: hidden;">
+          <div class="chatbot-messages" id="support-messages"></div>
+          <div class="chatbot-input-area">
+            <input type="text" id="support-input" placeholder="Message admin..." onkeypress="handleChatKey(event, 'support')" data-translate="chat_placeholder_admin">
+            <button onclick="sendChatMessage('support')"><i class="fa-solid fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chatbot Script -->
+  <script>
+    let activeMode = 'ai';
+    let chatToken = localStorage.getItem('ims_chat_token');
+    let supportPollingInterval = null;
+
+    function toggleChatbot() {
+      const win = document.getElementById('chatbot-window');
+      win.classList.toggle('open');
+      if (win.classList.contains('open')) {
+        if (activeMode === 'support' && chatToken) {
+          loadSupportMessages();
+          startSupportPolling();
+        }
+      } else {
+        stopSupportPolling();
+      }
+    }
+
+    function setChatMode(mode) {
+      activeMode = mode;
+      document.getElementById('mode-btn-ai').classList.toggle('active', mode === 'ai');
+      document.getElementById('mode-btn-support').classList.toggle('active', mode === 'support');
+      
+      document.getElementById('chatbot-view-ai').style.display = mode === 'ai' ? 'flex' : 'none';
+      document.getElementById('chatbot-view-support').style.display = mode === 'support' ? 'flex' : 'none';
+
+      if (mode === 'support') {
+        if (chatToken) {
+          document.getElementById('support-init-form').style.display = 'none';
+          document.getElementById('support-chat-area').style.display = 'flex';
+          loadSupportMessages();
+          startSupportPolling();
+        } else {
+          document.getElementById('support-init-form').style.display = 'flex';
+          document.getElementById('support-chat-area').style.display = 'none';
+        }
+      } else {
+        stopSupportPolling();
+      }
+    }
+
+    function handleChatKey(e, mode) {
+      if (e.key === 'Enter') {
+        sendChatMessage(mode);
+      }
+    }
+
+    let currentTypingIndicator = null;
+
+    function showTypingIndicator(containerId) {
+      hideTypingIndicator();
+      const container = document.getElementById(containerId);
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble assistant typing-indicator-bubble`;
+      bubble.innerHTML = `
+        <div class="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      `;
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+      currentTypingIndicator = bubble;
+    }
+
+    function hideTypingIndicator() {
+      if (currentTypingIndicator && currentTypingIndicator.parentNode) {
+        currentTypingIndicator.parentNode.removeChild(currentTypingIndicator);
+      }
+      currentTypingIndicator = null;
+    }
+
+    async function sendChatMessage(mode) {
+      if (mode === 'ai') {
+        const input = document.getElementById('ai-input');
+        const val = input.value.trim();
+        if (!val) return;
+        input.value = '';
+
+        appendMessage('ai-messages', 'user', val);
+        showTypingIndicator('ai-messages');
+
+        try {
+          const formData = new FormData();
+          formData.append('message', val);
+          formData.append('lang', localStorage.getItem('lang') || 'en');
+          const res = await fetch('/api/chat/ai', {
+            method: 'POST',
+            body: formData
+          });
+          const data = await res.json();
+          hideTypingIndicator();
+          appendMessage('ai-messages', 'assistant', data.reply);
+        } catch (err) {
+          console.error("AI chat error:", err);
+          hideTypingIndicator();
+          appendMessage('ai-messages', 'assistant', "Sorry, I encountered an error. Please try again or chat with our admin!");
+        }
+      } else if (mode === 'support') {
+        const input = document.getElementById('support-input');
+        const val = input.value.trim();
+        if (!val || !chatToken) return;
+        input.value = '';
+
+        appendMessage('support-messages', 'user', val);
+
+        try {
+          const formData = new FormData();
+          formData.append('token', chatToken);
+          formData.append('message', val);
+          await fetch('/api/chat/support/send', {
+            method: 'POST',
+            body: formData
+          });
+          loadSupportMessages();
+        } catch (err) {
+          console.error("Send support message error:", err);
+        }
+      }
+    }
+
+    function appendMessage(containerId, sender, text) {
+      const container = document.getElementById(containerId);
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble ${sender}`;
+      bubble.textContent = text;
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function askFAQ(question) {
+      appendMessage('ai-messages', 'user', question);
+      showTypingIndicator('ai-messages');
+      try {
+        const formData = new FormData();
+        formData.append('message', question);
+        formData.append('lang', localStorage.getItem('lang') || 'en');
+        const res = await fetch('/api/chat/ai', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        hideTypingIndicator();
+        appendMessage('ai-messages', 'assistant', data.reply);
+      } catch (err) {
+        hideTypingIndicator();
+        appendMessage('ai-messages', 'assistant', "Could not contact AI agent.");
+      }
+    }
+
+    async function initSupportSession() {
+      const name = document.getElementById('support-name').value.trim();
+      const email = document.getElementById('support-email').value.trim();
+      if (!name || !email) {
+        alert("Name and Email are required!");
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('email', email);
+        const res = await fetch('/api/chat/support/init', {
+          method: 'POST',
+          body: formData
+        });
+        if (res.ok) {
+          const data = await res.json();
+          chatToken = data.token;
+          localStorage.setItem('ims_chat_token', chatToken);
+          
+          document.getElementById('support-init-form').style.display = 'none';
+          document.getElementById('support-chat-area').style.display = 'flex';
+          loadSupportMessages();
+          startSupportPolling();
+        } else {
+          alert("Failed to initialize support chat. Please try again.");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function loadSupportMessages() {
+      if (!chatToken) return;
+      try {
+        const res = await fetch(`/api/chat/support/messages?token=${chatToken}`);
+        if (!res.ok) return;
+        const messages = await res.json();
+        const container = document.getElementById('support-messages');
+        
+        const wasAtBottom = container.scrollHeight - container.clientHeight <= container.scrollTop + 20;
+
+        let html = '';
+        messages.forEach(m => {
+          const sender = m.sender_type === 'admin' ? 'assistant' : 'user';
+          html += `<div class="chat-bubble ${sender}">${escapeHTML(m.message)}</div>`;
+        });
+        container.innerHTML = html;
+
+        if (wasAtBottom || container.scrollTop === 0) {
+          container.scrollTop = container.scrollHeight;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function startSupportPolling() {
+      if (supportPollingInterval) clearInterval(supportPollingInterval);
+      supportPollingInterval = setInterval(loadSupportMessages, 4000);
+    }
+
+    function stopSupportPolling() {
+      if (supportPollingInterval) {
+        clearInterval(supportPollingInterval);
+        supportPollingInterval = null;
+      }
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
   </script>
 </body>
 

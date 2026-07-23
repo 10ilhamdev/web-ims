@@ -1,9 +1,11 @@
+
 package controllers
 
 import (
 	"ims/app/facades"
 	"ims/app/models"
 	"strconv"
+	"strings"
 
 	"github.com/goravel/framework/contracts/http"
 )
@@ -105,6 +107,18 @@ func (r *AdminController) Users(ctx http.Context) http.Response {
 	})
 }
 
+// CreateUserForm shows the create user page
+func (r *AdminController) CreateUserForm(ctx http.Context) http.Response {
+	user := GetCurrentUser(ctx)
+	if user == nil || user.Role != "admin" {
+		return ctx.Response().Redirect(http.StatusFound, "/login")
+	}
+
+	return ctx.Response().View().Make("admin/users_create.tmpl", map[string]any{
+		"User": user,
+	})
+}
+
 // CreateUser handles admin adding a new user
 func (r *AdminController) CreateUser(ctx http.Context) http.Response {
 	user := GetCurrentUser(ctx)
@@ -118,7 +132,7 @@ func (r *AdminController) CreateUser(ctx http.Context) http.Response {
 	role := ctx.Request().Input("role")
 
 	if name == "" || email == "" || password == "" {
-		return ctx.Response().Redirect(http.StatusFound, "/admin/users")
+		return ctx.Response().Redirect(http.StatusFound, "/admin/users/create")
 	}
 
 	hashedPassword, err := facades.Hash().Make(password)
@@ -130,6 +144,98 @@ func (r *AdminController) CreateUser(ctx http.Context) http.Response {
 			Role:     role,
 		}
 		_ = facades.Orm().Query().Create(&newUser)
+	}
+
+	return ctx.Response().Redirect(http.StatusFound, "/admin/users")
+}
+
+// UserDetail shows dynamic details about a specific user
+func (r *AdminController) UserDetail(ctx http.Context) http.Response {
+	user := GetCurrentUser(ctx)
+	if user == nil || user.Role != "admin" {
+		return ctx.Response().Redirect(http.StatusFound, "/login")
+	}
+
+	uIDStr := ctx.Request().Route("user_id")
+	uID, err := strconv.Atoi(uIDStr)
+	if err != nil {
+		return ctx.Response().Redirect(http.StatusFound, "/admin/users")
+	}
+
+	var targetUser models.User
+	err = facades.Orm().Query().Find(&targetUser, uID)
+	if err != nil || targetUser.ID == 0 {
+		return ctx.Response().Redirect(http.StatusFound, "/admin/users")
+	}
+
+	return ctx.Response().View().Make("admin/users_detail.tmpl", map[string]any{
+		"User":       user,
+		"TargetUser": targetUser,
+	})
+}
+
+// EditUserForm shows edit profile details page
+func (r *AdminController) EditUserForm(ctx http.Context) http.Response {
+	user := GetCurrentUser(ctx)
+	if user == nil || user.Role != "admin" {
+		return ctx.Response().Redirect(http.StatusFound, "/login")
+	}
+
+	uIDStr := ctx.Request().Route("user_id")
+	uID, err := strconv.Atoi(uIDStr)
+	if err != nil {
+		return ctx.Response().Redirect(http.StatusFound, "/admin/users")
+	}
+
+	var targetUser models.User
+	err = facades.Orm().Query().Find(&targetUser, uID)
+	if err != nil || targetUser.ID == 0 {
+		return ctx.Response().Redirect(http.StatusFound, "/admin/users")
+	}
+
+	return ctx.Response().View().Make("admin/users_edit.tmpl", map[string]any{
+		"User":       user,
+		"TargetUser": targetUser,
+	})
+}
+
+// UpdateUser processes updates to user profile details
+func (r *AdminController) UpdateUser(ctx http.Context) http.Response {
+	user := GetCurrentUser(ctx)
+	if user == nil || user.Role != "admin" {
+		return ctx.Response().Redirect(http.StatusFound, "/login")
+	}
+
+	uIDStr := ctx.Request().Route("user_id")
+	uID, err := strconv.Atoi(uIDStr)
+	if err != nil {
+		return ctx.Response().Redirect(http.StatusFound, "/admin/users")
+	}
+
+	var targetUser models.User
+	err = facades.Orm().Query().Find(&targetUser, uID)
+	if err != nil || targetUser.ID == 0 {
+		return ctx.Response().Redirect(http.StatusFound, "/admin/users")
+	}
+
+	name := ctx.Request().Input("name")
+	email := ctx.Request().Input("email")
+	password := ctx.Request().Input("password")
+	role := ctx.Request().Input("role")
+
+	if name != "" && email != "" {
+		targetUser.Name = name
+		targetUser.Email = email
+		targetUser.Role = role
+
+		if password != "" {
+			hashedPassword, err := facades.Hash().Make(password)
+			if err == nil {
+				targetUser.Password = hashedPassword
+			}
+		}
+
+		_ = facades.Orm().Query().Save(&targetUser)
 	}
 
 	return ctx.Response().Redirect(http.StatusFound, "/admin/users")
@@ -233,7 +339,7 @@ func (r *AdminController) DeleteCmsPage(ctx http.Context) http.Response {
 	return ctx.Response().Redirect(http.StatusFound, "/admin/cms")
 }
 
-// CmsPageDetail shows specific contents inside page
+// CmsPageDetail shows specific contents inside page grouped by section
 func (r *AdminController) CmsPageDetail(ctx http.Context) http.Response {
 	user := GetCurrentUser(ctx)
 	if user == nil || user.Role != "admin" {
@@ -255,11 +361,66 @@ func (r *AdminController) CmsPageDetail(ctx http.Context) http.Response {
 	var contents []models.GuestContent
 	_ = facades.Orm().Query().Where("page_id = ?", page.ID).Get(&contents)
 
+	var products []models.Product
+	if page.Type == "products" {
+		_ = facades.Orm().Query().Get(&products)
+	}
+
+	// Group contents by section to avoid one massive single card in UI
+	groupedContents := make(map[string][]models.GuestContent)
+	var sectionsOrder []string
+	for _, c := range contents {
+		sec := c.Section
+		if sec == "" {
+			sec = "Umum / Lainnya"
+		}
+		if _, exists := groupedContents[sec]; !exists {
+			sectionsOrder = append(sectionsOrder, sec)
+		}
+		groupedContents[sec] = append(groupedContents[sec], c)
+	}
+
 	return ctx.Response().View().Make("admin/cms_detail.tmpl", map[string]any{
-		"User":     user,
-		"Page":     page,
-		"Contents": contents,
+		"User":            user,
+		"Page":            page,
+		"GroupedContents": groupedContents,
+		"SectionsOrder":   sectionsOrder,
+		"Products":        products,
 	})
+}
+
+// UpdateProductPrice processes updates to product prices from CMS detail page
+func (r *AdminController) UpdateProductPrice(ctx http.Context) http.Response {
+	user := GetCurrentUser(ctx)
+	if user == nil || user.Role != "admin" {
+		return ctx.Response().Redirect(http.StatusFound, "/login")
+	}
+
+	prodIDStr := ctx.Request().Route("product_id")
+	prodID, err := strconv.Atoi(prodIDStr)
+	if err != nil {
+		return ctx.Response().Redirect(http.StatusFound, "/admin/cms")
+	}
+
+	origPriceStr := ctx.Request().Input("original_price")
+	discountStr := ctx.Request().Input("discount")
+
+	origPrice, err1 := strconv.ParseFloat(origPriceStr, 64)
+	discount, err2 := strconv.ParseFloat(discountStr, 64)
+
+	if err1 == nil && err2 == nil {
+		var product models.Product
+		_ = facades.Orm().Query().Find(&product, prodID)
+		if product.ID != 0 {
+			product.OriginalPrice = origPrice
+			product.Discount = discount
+			// Calculate discounted price automatically
+			product.Price = origPrice * (1 - discount/100)
+			_ = facades.Orm().Query().Save(&product)
+		}
+	}
+
+	return ctx.Response().Redirect(http.StatusFound, "/admin/cms/pages/3")
 }
 
 // UpdateCmsPageContents updates key values inside page
@@ -279,11 +440,37 @@ func (r *AdminController) UpdateCmsPageContents(ctx http.Context) http.Response 
 	_ = facades.Orm().Query().Where("page_id = ?", pID).Get(&contents)
 
 	for _, c := range contents {
-		valId := ctx.Request().Input(c.Key + "_id")
-		valEn := ctx.Request().Input(c.Key + "_en")
-		c.ValueId = valId
-		c.ValueEn = valEn
-		_ = facades.Orm().Query().Save(&c)
+		idKey := c.Key + "_id"
+		enKey := c.Key + "_en"
+		
+		valId := ctx.Request().Input(idKey)
+		valEn := ctx.Request().Input(enKey)
+		
+		hasUpdate := false
+		if valId != "" {
+			c.ValueId = valId
+			hasUpdate = true
+		}
+		if valEn != "" {
+			c.ValueEn = valEn
+			hasUpdate = true
+		}
+		
+		if hasUpdate {
+			_ = facades.Orm().Query().Save(&c)
+		}
+	}
+
+	// Handle deferred/batch deleted keys submitted by this form
+	deletedKeysStr := ctx.Request().Input("deleted_keys")
+	if deletedKeysStr != "" {
+		ids := strings.Split(deletedKeysStr, ",")
+		for _, idStr := range ids {
+			id, err := strconv.Atoi(idStr)
+			if err == nil {
+				_, _ = facades.Orm().Query().Where("id = ?", id).Delete(&models.GuestContent{})
+			}
+		}
 	}
 
 	return ctx.Response().Redirect(http.StatusFound, "/admin/cms/pages/"+pIDStr)
@@ -305,6 +492,8 @@ func (r *AdminController) CreateCmsPageContent(ctx http.Context) http.Response {
 	key := ctx.Request().Input("key")
 	valId := ctx.Request().Input("value_id")
 	valEn := ctx.Request().Input("value_en")
+	section := ctx.Request().Input("section")
+	style := ctx.Request().Input("style")
 
 	if key != "" {
 		newContent := models.GuestContent{
@@ -312,11 +501,35 @@ func (r *AdminController) CreateCmsPageContent(ctx http.Context) http.Response {
 			Key:     key,
 			ValueId: valId,
 			ValueEn: valEn,
+			Section: section,
+			Style:   style,
 		}
 		_ = facades.Orm().Query().Create(&newContent)
 	}
 
 	return ctx.Response().Redirect(http.StatusFound, "/admin/cms/pages/"+pIDStr)
+}
+
+// DeleteCmsPageContent deletes a specific content translation key
+func (r *AdminController) DeleteCmsPageContent(ctx http.Context) http.Response {
+	user := GetCurrentUser(ctx)
+	if user == nil || user.Role != "admin" {
+		return ctx.Response().Redirect(http.StatusFound, "/login")
+	}
+
+	contentIDStr := ctx.Request().Route("content_id")
+	contentID, err := strconv.Atoi(contentIDStr)
+	if err == nil {
+		var content models.GuestContent
+		_ = facades.Orm().Query().Find(&content, contentID)
+		if content.ID != 0 {
+			pageIDStr := strconv.Itoa(int(content.PageID))
+			_, _ = facades.Orm().Query().Where("id = ?", content.ID).Delete(&models.GuestContent{})
+			return ctx.Response().Redirect(http.StatusFound, "/admin/cms/pages/"+pageIDStr)
+		}
+	}
+
+	return ctx.Response().Redirect(http.StatusFound, "/admin/cms")
 }
 
 // Roles displays the custom database schemas and roles listing page
@@ -343,18 +556,31 @@ func (r *AdminController) CreateRole(ctx http.Context) http.Response {
 	}
 
 	name := ctx.Request().Input("name")
+	label := ctx.Request().Input("label")
 	tableName := ctx.Request().Input("table_name")
-	modelName := ctx.Request().Input("model_name")
-	fields := ctx.Request().Input("fields")
-	relations := ctx.Request().Input("relations")
+	relationName := ctx.Request().Input("relation_name")
+	isSystemStr := ctx.Request().Input("is_system", "0")
+	isRegisterableStr := ctx.Request().Input("is_registerable", "0")
+	badgeColor := ctx.Request().Input("badge_color")
+	description := ctx.Request().Input("description")
+	dashboardRoute := ctx.Request().Input("dashboard_route")
+	dashboardView := ctx.Request().Input("dashboard_view")
+
+	isSystem := isSystemStr == "1" || isSystemStr == "true"
+	isRegisterable := isRegisterableStr == "1" || isRegisterableStr == "true"
 
 	if name != "" {
 		newRole := models.Role{
-			Name:      name,
-			TableName: tableName,
-			ModelName: modelName,
-			Fields:    fields,
-			Relations: relations,
+			Name:           name,
+			Label:          label,
+			TableName:      tableName,
+			RelationName:   relationName,
+			IsSystem:       isSystem,
+			IsRegisterable: isRegisterable,
+			BadgeColor:     badgeColor,
+			Description:    description,
+			DashboardRoute: dashboardRoute,
+			DashboardView:  dashboardView,
 		}
 		_ = facades.Orm().Query().Create(&newRole)
 	}
@@ -378,11 +604,19 @@ func (r *AdminController) UpdateRole(ctx http.Context) http.Response {
 	var role models.Role
 	err = facades.Orm().Query().Find(&role, roleID)
 	if err == nil {
+		isSystemStr := ctx.Request().Input("is_system", "0")
+		isRegisterableStr := ctx.Request().Input("is_registerable", "0")
+
 		role.Name = ctx.Request().Input("name")
+		role.Label = ctx.Request().Input("label")
 		role.TableName = ctx.Request().Input("table_name")
-		role.ModelName = ctx.Request().Input("model_name")
-		role.Fields = ctx.Request().Input("fields")
-		role.Relations = ctx.Request().Input("relations")
+		role.RelationName = ctx.Request().Input("relation_name")
+		role.IsSystem = isSystemStr == "1" || isSystemStr == "true"
+		role.IsRegisterable = isRegisterableStr == "1" || isRegisterableStr == "true"
+		role.BadgeColor = ctx.Request().Input("badge_color")
+		role.Description = ctx.Request().Input("description")
+		role.DashboardRoute = ctx.Request().Input("dashboard_route")
+		role.DashboardView = ctx.Request().Input("dashboard_view")
 		_ = facades.Orm().Query().Save(&role)
 	}
 
@@ -427,21 +661,43 @@ func (r *AdminController) GetDbColumns(ctx http.Context) http.Response {
 		return ctx.Response().Json(http.StatusBadRequest, map[string]any{"error": "table parameter is required"})
 	}
 
-	type ColumnInfo struct {
-		Field string `gorm:"column:Field"`
+	type ColumnSchema struct {
+		Name       string `gorm:"column:name" json:"name"`
+		Type       string `gorm:"column:type" json:"type"`
+		FullType   string `gorm:"column:full_type" json:"full_type"`
+		IsNullable string `gorm:"column:is_nullable" json:"is_nullable"`
+		ColKey     string `gorm:"column:col_key" json:"col_key"`
+		Extra      string `gorm:"column:extra" json:"extra"`
+		RefTable   string `gorm:"column:ref_table" json:"ref_table"`
+		RefColumn  string `gorm:"column:ref_column" json:"ref_column"`
 	}
-	var cols []ColumnInfo
-	err := facades.Orm().Query().Raw("SHOW COLUMNS FROM " + tableName).Scan(&cols)
+	var cols []ColumnSchema
+	query := `
+		SELECT 
+			c.COLUMN_NAME as name,
+			c.DATA_TYPE as type,
+			c.COLUMN_TYPE as full_type,
+			c.IS_NULLABLE as is_nullable,
+			c.COLUMN_KEY as col_key,
+			c.EXTRA as extra,
+			k.REFERENCED_TABLE_NAME as ref_table,
+			k.REFERENCED_COLUMN_NAME as ref_column
+		FROM information_schema.COLUMNS c
+		LEFT JOIN information_schema.KEY_COLUMN_USAGE k 
+			ON c.TABLE_SCHEMA = k.TABLE_SCHEMA 
+			AND c.TABLE_NAME = k.TABLE_NAME 
+			AND c.COLUMN_NAME = k.COLUMN_NAME
+			AND k.REFERENCED_TABLE_NAME IS NOT NULL
+		WHERE c.TABLE_SCHEMA = DATABASE() 
+			AND c.TABLE_NAME = ?
+		ORDER BY c.ORDINAL_POSITION
+	`
+	err := facades.Orm().Query().Raw(query, tableName).Scan(&cols)
 	if err != nil {
 		return ctx.Response().Json(http.StatusInternalServerError, map[string]any{"error": err.Error()})
 	}
 
-	var columns []string
-	for _, col := range cols {
-		columns = append(columns, col.Field)
-	}
-
-	return ctx.Response().Json(http.StatusOK, columns)
+	return ctx.Response().Json(http.StatusOK, cols)
 }
 
 
